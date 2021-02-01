@@ -1,9 +1,6 @@
 package it.sauronsoftware.jave.audio;
 
-import it.sauronsoftware.jave.Encoder;
-import it.sauronsoftware.jave.EncoderException;
-import it.sauronsoftware.jave.EncodingAttributes;
-import it.sauronsoftware.jave.IgnoreErrorEncoder;
+import it.sauronsoftware.jave.*;
 import it.sauronsoftware.jave.enumers.MergeTypeEnum;
 
 import java.io.File;
@@ -114,8 +111,8 @@ public class AudioUtils {
     }
 
     public static void mergeAudio(List<File> sourceList, File target, EncodingAttributes attrs) {
-        if (attrs == null){
-            defultMergeAudio(sourceList,target);
+        if (attrs == null) {
+            defultMergeAudio(sourceList, target);
             return;
         }
         Encoder encoder = new IgnoreErrorEncoder();
@@ -137,6 +134,39 @@ public class AudioUtils {
         Encoder encoder = new IgnoreErrorEncoder();
         try {
             encoder.encode(sourceList, target, attrs);
+        } catch (EncoderException e) {
+            throw new IllegalStateException("operate error: ", e);
+        }
+    }
+
+    public static MultimediaInfo getAudioInfo(File source) {
+        Encoder encoder = new IgnoreErrorEncoder();
+        MultimediaInfo info = null;
+        try {
+            info = encoder.getInfo(source);
+        } catch (EncoderException e) {
+            e.printStackTrace();
+        }
+        return info;
+    }
+
+    /**
+     * 音频倍速播放
+     * @param source
+     * @param target
+     * @param atempo
+     */
+    public static void audioAtempo(File source, File target, Double atempo) {
+        AudioAttributes audioAttributes = new AudioAttributes();
+        String af = "atempo=" + atempo;
+        audioAttributes.setAf(af);
+
+        EncodingAttributes attrs = new EncodingAttributes();
+        attrs.setAudioAttributes(audioAttributes);
+
+        Encoder encoder = new IgnoreErrorEncoder();
+        try {
+            encoder.encode(source, target, attrs);
         } catch (EncoderException e) {
             throw new IllegalStateException("operate error: ", e);
         }

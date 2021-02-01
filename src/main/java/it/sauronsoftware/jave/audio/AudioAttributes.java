@@ -62,11 +62,25 @@ public class AudioAttributes {
 	 */
 	private Integer volume = null;
 
-	//开始剪辑时间 格式：00:00:00
+	/**
+	 * 开始剪辑时间 格式：00:00:00
+	 */
 	private String startTime;
-	//截取时长
+	/**
+	 * 截取时长
+	 */
 	private String duration;
 
+	/**
+	 * 合并类型
+	 */
 	private MergeTypeEnum mergeType;
+
+	/**
+	 * filter_graph 过滤视图
+	 * set video filters 用来设置音频过滤器 简称：af
+	 * ps：atempo=0.5  atempo只支持0.5到2.0的数值，如果想要调整只四倍速，可以填写两组atempo（atempo=2.0,atempo=2.0）
+	 */
+	private String af;
 
 }

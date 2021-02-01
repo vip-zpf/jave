@@ -9,7 +9,6 @@ import java.util.Arrays;
 
 /**
  * jave 音频转换测试
- *
  */
 public class AudioTest {
 
@@ -59,7 +58,14 @@ public class AudioTest {
         File source4 = new File("target/test-classes/material/diaochan.mp3");
         File source5 = new File("target/test-classes/material/direnjie.mp3");
         File targetSource = new File("target/test-classes/material/wangzherongyao.wav");
-        AudioUtils.mergeAudio(Arrays.asList(source1, source2,source3,source4,source5), targetSource, null);
+        AudioUtils.mergeAudio(Arrays.asList(source1, source2, source3, source4, source5), targetSource, null);
+    }
+
+    @Test
+    public void audioAtempo() {
+        File source = new File("target/test-classes/material/longAudio.mp3");
+        File target = new File("target/test-classes/material/longAudio-atempo.mp3");
+        AudioUtils.audioAtempo(source, target, 0.8);
     }
 }
 

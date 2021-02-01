@@ -1,9 +1,6 @@
 package it.sauronsoftware.jave.video;
 
-import it.sauronsoftware.jave.Encoder;
-import it.sauronsoftware.jave.EncoderException;
-import it.sauronsoftware.jave.EncodingAttributes;
-import it.sauronsoftware.jave.IgnoreErrorEncoder;
+import it.sauronsoftware.jave.*;
 import it.sauronsoftware.jave.audio.AudioAttributes;
 import org.apache.commons.lang3.StringUtils;
 
@@ -14,24 +11,35 @@ import java.io.File;
  */
 public class VideoUtils {
 
+
     /**
-     * 获取视频缩略图
+     * 获取视频缩略图，每秒抽一帧
      *
-     * @param source
-     * @param imageTargetPath
-     * @param attrs
+     * @param source          视频来源
+     * @param imageTargetPath 缩略图存放目标文件
      */
-    public static void thumbnail(File source, File imageTargetPath, EncodingAttributes attrs) {
-        if (attrs == null) {
-            thumbnail(source, imageTargetPath);
-            return;
-        }
-        Encoder encoder = new IgnoreErrorEncoder();
-        try {
-            encoder.encode(source, imageTargetPath, attrs);
-        } catch (Exception e) {
-            throw new IllegalStateException("error: ", e);
-        }
+    public static void thumbnailByOneFramePerSecond(File source, File imageTargetPath) {
+        thumbnail(source, imageTargetPath, 1, null, null, null,"2");
+    }
+
+    /**
+     * 获取视频缩略图，每5秒抽一帧
+     *
+     * @param source          视频来源
+     * @param imageTargetPath 缩略图存放目标文件
+     */
+    public static void thumbnailByOneFrameEveryFiveSeconds(File source, File imageTargetPath) {
+        thumbnail(source, imageTargetPath, 1, 5d, null, null,null);
+    }
+
+    /**
+     * 获取视频缩略图，每5秒抽一帧,从startTime开始抽，持续duration秒
+     *
+     * @param source          视频来源
+     * @param imageTargetPath 缩略图存放目标文件
+     */
+    public static void thumbnailByOneFrameEveryFiveSecondsAndStartTime(File source, File imageTargetPath, String startTime, String duration) {
+        thumbnail(source, imageTargetPath, 1, 5d, startTime, duration,null);
     }
 
     /**
@@ -39,12 +47,31 @@ public class VideoUtils {
      *
      * @param source          视频来源
      * @param imageTargetPath 缩略图存放目标文件
+     * @param frameRate       每秒抽几帧
+     * @param intervalTime    间隔时间（每隔多少秒抽取几帧）
+     * @param startTime       开始时间（从什么时间开始操作）
+     * @param duration        持续时长
+     * @param qv               设置图片质量
      */
-    public static void thumbnail(File source, File imageTargetPath) {
+    public static void thumbnail(File source, File imageTargetPath, Integer frameRate, Double intervalTime, String startTime, String duration, String qv) {
         Encoder encoder = new IgnoreErrorEncoder();
         VideoAttributes video = new VideoAttributes();
-        video.setFrameRate(1);
-
+        if (frameRate != null && intervalTime == null) {
+            video.setFrameRate(frameRate);
+        }
+        if (frameRate != null && intervalTime != null) {
+            String fps = "fps=" + frameRate + "/" + intervalTime;
+            video.setVf(fps);
+        }
+        if (startTime != null) {
+            video.setStartTime(startTime);
+        }
+        if (duration != null) {
+            video.setDuration(duration);
+        }
+        if (qv != null && qv.length()>0){
+            video.setQv(qv);
+        }
         EncodingAttributes attrs = new EncodingAttributes();
         attrs.setFormat("image2");
         attrs.setVideoAttributes(video);
@@ -130,5 +157,16 @@ public class VideoUtils {
         } catch (Exception e) {
             throw new IllegalStateException("error: ", e);
         }
+    }
+
+    public static MultimediaInfo getVideoInfo(File source) {
+        Encoder encoder = new IgnoreErrorEncoder();
+        MultimediaInfo info = null;
+        try {
+            info = encoder.getInfo(source);
+        } catch (EncoderException e) {
+            e.printStackTrace();
+        }
+        return info;
     }
 }

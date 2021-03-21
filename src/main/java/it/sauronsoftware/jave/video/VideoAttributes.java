@@ -79,9 +79,9 @@ public class VideoAttributes implements Serializable {
     private String vf;
 
     /**
-     * 指定视频截取质量 ps：v 2
+     * 指定视频截取质量 ps：2
      * to control output quality. Full range is a linear scale of 1-31 where a lower value results in a higher quality. 2-5 is a good range to try.
      */
-    private String q;
+    private String qv;
 
 }

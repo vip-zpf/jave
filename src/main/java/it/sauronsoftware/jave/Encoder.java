@@ -823,22 +823,29 @@ public class Encoder {
             }
 
         }
-        if (formatAttribute != null && formatAttribute.length()>0){
+
+        if (formatAttribute != null && formatAttribute.length() > 0) {
             ffmpeg.addArgument("-f");
             ffmpeg.addArgument(formatAttribute);
         }
 
-        if (videoAttributes.getQ()!= null && videoAttributes.getQ().length()>0){
-            ffmpeg.addArgument("-q");
-            ffmpeg.addArgument(videoAttributes.getQ());
+        if (videoAttributes != null &&
+                videoAttributes.getQv() != null &&
+                videoAttributes.getQv().length() > 0) {
+            ffmpeg.addArgument("-q:v");
+            ffmpeg.addArgument(videoAttributes.getQv());
         }
 
-        if (videoAttributes.getVf()!= null && videoAttributes.getVf().length()>0){
+        if (videoAttributes != null &&
+                videoAttributes.getVf() != null &&
+                videoAttributes.getVf().length() > 0) {
             ffmpeg.addArgument("-vf");
             ffmpeg.addArgument(videoAttributes.getVf());
         }
 
-        if (audioAttributes.getAf()!= null && audioAttributes.getAf().length()>0){
+        if (audioAttributes != null &&
+                audioAttributes.getAf() != null &&
+                audioAttributes.getAf().length() > 0) {
             ffmpeg.addArgument("-af");
             ffmpeg.addArgument(audioAttributes.getAf());
         }

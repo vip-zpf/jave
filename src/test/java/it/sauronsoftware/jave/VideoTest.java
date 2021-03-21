@@ -16,9 +16,26 @@ public class VideoTest {
 
     @Test
     public void thumbnail() {
-        File source = new File("target/test-classes/material/testVideo.avi");
+        File source = new File("target/test-classes/material/man.mp4");
         File target = new File("target/test-classes/material/image/image-%3d.jpeg");
-        VideoUtils.thumbnail(source, target, null);
+        VideoUtils.thumbnailByOneFramePerSecond(source, target);
+    }
+
+    @Test
+    public void thumbnail2() {
+        File source = new File("target/test-classes/material/man.mp4");
+        File target = new File("target/test-classes/material/image/image-%3d.jpeg");
+        //每隔5秒抽1帧图片
+        VideoUtils.thumbnailByOneFrameEveryFiveSeconds(source, target);
+    }
+
+    @Test
+    public void thumbnail3() {
+        File source = new File("target/test-classes/material/man.mp4");
+        File target = new File("target/test-classes/material/image/image-%3d.jpeg");
+        //每隔5秒抽1帧图片,从视频的第10秒开始
+        String startTime = "00:00:10";
+        VideoUtils.thumbnailByOneFrameEveryFiveSecondsAndStartTime(source, target, startTime, "5");
     }
 
     @Test
@@ -72,8 +89,4 @@ public class VideoTest {
         attrs.setAudioAttributes(new AudioAttributes());
         VideoUtils.getVoideoAudio(source,target,attrs);
     }
-
-
-
-
 }

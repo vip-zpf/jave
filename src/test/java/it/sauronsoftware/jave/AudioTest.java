@@ -65,7 +65,7 @@ public class AudioTest {
     public void audioAtempo() {
         File source = new File("target/test-classes/material/longAudio.mp3");
         File target = new File("target/test-classes/material/longAudio-atempo.mp3");
-        AudioUtils.audioAtempo(source, target, 1.5);
+        AudioUtils.audioAtempo(source, target, 0.8);
     }
 }
 

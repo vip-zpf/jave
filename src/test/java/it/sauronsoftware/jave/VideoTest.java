@@ -8,6 +8,7 @@ import org.junit.Test;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.LinkedList;
 
 /**
  * 视频转换测试
@@ -40,17 +41,19 @@ public class VideoTest {
 
     @Test
     public void getVideo() throws EncoderException {
-        File source = new File("target/test-classes/material/testVideo.avi");
+        File source = new File("target/test-classes/material/girl.mp4");
         File target = new File("target/test-classes/material/target.wav");
         VideoUtils.getVoideoAudio(source, target, null);
     }
 
+    //无损合并
     @Test
     public void mergeVideo() throws EncoderException, IOException {
-        File source1 = new File("target/test-classes/material/face.mp4");
-        File source2 = new File("target/test-classes/material/girl.mp4");
-        File source3 = new File("target/test-classes/material/man.mp4");
+        File source1 = new File("target/test-classes/material/girl.mp4");
+        File source2 = new File("target/test-classes/material/man.mp4");
+        File source3 = new File("target/test-classes/material/face.mp4");
         File target = new File("target/test-classes/material/aaa.mp4");
+
         String data = new StringBuffer().
                 append("file '").append(source1.getAbsolutePath()).append("'").append(System.getProperty("line.separator")).
                 append("file '").append(source2.getAbsolutePath()).append("'").append(System.getProperty("line.separator")).
@@ -58,24 +61,57 @@ public class VideoTest {
                 toString();
         File mergeVideoTxt = new File("target/test-classes/material/", "mergeVideo.txt");
         FileUtils.writeStringToFile(mergeVideoTxt, data, "UTF-8", false);
-        VideoUtils.mergeVoideo(mergeVideoTxt, target, "mp4");
+        VideoUtils.mergeVideoByLossless(mergeVideoTxt, target, "mp4");
+    }
+
+    //有损合并视频
+    @Test
+    public void mergeAudioVideo() throws EncoderException, IOException {
+        File source1 = new File("target/test-classes/material/girl.mp4");
+        File source2 = new File("target/test-classes/material/man.mp4");
+        File source3 = new File("target/test-classes/material/girl.mp4");
+        File target = new File("target/test-classes/material/bbb.mkv");
+
+        LinkedList<File> files = new LinkedList<>();
+        files.add(source1);
+        files.add(source2);
+        files.add(source3);
+        VideoUtils.mergeVideoByDamaging(files, target, "mp4");
     }
 
 
+    //视频中插入音频（视频原本无音频）
     @Test
-    public void mergeAudioVideo() throws EncoderException, IOException {
-        File source1 = new File("target/test-classes/material/aaa.mp4");
+    public void mergeVideoAndVideoByInsert() throws EncoderException, IOException {
+        File source1 = new File("target/test-classes/material/face.mp4");
         File source2 = new File("target/test-classes/material/wangzherongyao.wav");
-        File source3 = new File("target/test-classes/material/wangzherongyao.wav");
-        File target = new File("target/test-classes/material/bbb.mp4");
-        String data = new StringBuffer().
-                append("file '").append(source1.getAbsolutePath()).append("'").append(System.getProperty("line.separator")).
-                append("file '").append(source2.getAbsolutePath()).append("'").append(System.getProperty("line.separator")).
-                append("file '").append(source3.getAbsolutePath()).append("'").append(System.getProperty("line.separator")).
-                toString();
-        File mergeVideoTxt = new File("target/test-classes/material/", "mergeVideo.txt");
-        FileUtils.writeStringToFile(mergeVideoTxt, data, "UTF-8", false);
-        VideoUtils.mergeVoideo(mergeVideoTxt, target, "mp4");
+        File target = new File("target/test-classes/material/videoAndAudio.mp4");
+
+        LinkedList<File> files = new LinkedList<>();
+        files.add(source1);
+        files.add(source2);
+        VideoUtils.mergeVoideoAndAudioByInsert(files, target, null);
+    }
+
+    //替换视频中的音频
+    @Test
+    public void mergeVideoAndVideoByRe() throws EncoderException, IOException {
+        File source1 = new File("target/test-classes/material/girl.mp4");
+        File source2 = new File("target/test-classes/material/wangzherongyao.wav");
+        File target = new File("target/test-classes/material/videoAndAudio2.mp4");
+
+        LinkedList<File> files = new LinkedList<>();
+        files.add(source1);
+        files.add(source2);
+        VideoUtils.mergeVoideoAndAudioByReplace(files, target, "mp4");
+    }
+
+    //旋转视频
+    @Test
+    public void roateVideo() {
+        File source = new File("target/test-classes/material/girl.mp4");
+        File target = new File("target/test-classes/material/girlRoate.mp4");
+        VideoUtils.roateVideo(source, target, "transpose=1");
     }
 
 

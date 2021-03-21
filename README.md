@@ -1,17 +1,19 @@
-
 # 音频转码工具
-因为是基于 JAVE 项目的修改，而 JAVE 是依赖 [ffmpeg](http://ffmpeg.org/) 所以可以适用于所有 ffmpeg 所支持的文件格式的转换。具体可以查看 [JAVE 官方文档](http://www.sauronsoftware.it/projects/jave/manual.php)
+
+因为是基于 JAVE 项目的修改，而 JAVE 是依赖 [ffmpeg](http://ffmpeg.org/) 所以可以适用于所有 ffmpeg
+所支持的文件格式的转换。具体可以查看 [JAVE 官方文档](http://www.sauronsoftware.it/projects/jave/manual.php)
 
 # 使用示例
 
 ## 引入 maven 依赖
 
 ```xml
- <dependency>
+
+<dependency>
     <groupId>com.github.vip-zpf</groupId>
     <artifactId>jave</artifactId>
     <version>1.0.3</version>
- </dependency>
+</dependency>
 ```
 
 # 原理
@@ -24,7 +26,7 @@
 ffmpeg 是依赖运行环境的，JAVE 项目封装了ffmpeg，它通过上述的原理使 java 可以调用ffmpeg而且支持跨平台。
 
 1. 项目老旧没再维护。官网最近版本是2009年发布的，其依赖的ffmpeg早已过时，很多情况下用不了。
-2. 转码一直报异常 EncoderException: Stream mapping 
+2. 转码一直报异常 EncoderException: Stream mapping
 3. 没有发布maven仓库，而且 JAVE 本身也不是一个maven项目
 4. 不支持mac
 
@@ -43,7 +45,6 @@ ffmpeg 是依赖运行环境的，JAVE 项目封装了ffmpeg，它通过上述�
 你可以通过环境变量或者在 java 中设置 `System.setProperty("ffmpeg.home", "ffmpeg可执行文件所在的目录")` 的方式指定你的系统中安装的可用的 ffmpeg 文件的目录
 
 如 `System.setProperty("ffmpeg.home", "/usr/local/bin/")`
-
 
 # 例子
 
@@ -106,13 +107,16 @@ ffmpeg 是依赖运行环境的，JAVE 项目封装了ffmpeg，它通过上述�
   VideoUtils.getVoideoAudio(source, target, null);
 ```
 
-* 合并多段视频
+* 无损-合并多段视频
 
 ```
-  File source1 = new File("target/test-classes/material/face.mp4");
-  File source2 = new File("target/test-classes/material/girl.mp4");
-  File source3 = new File("target/test-classes/material/man.mp4");
+  //1、如果第一个视频没有声音，那么合并后的视频也是没有声音的
+  //2、必须保证所有视频的格式，分辨率都一样，不然结果不可控
+  File source1 = new File("target/test-classes/material/girl.mp4");
+  File source2 = new File("target/test-classes/material/man.mp4");
+  File source3 = new File("target/test-classes/material/face.mp4");
   File target = new File("target/test-classes/material/aaa.mp4");
+
   String data = new StringBuffer().
           append("file '").append(source1.getAbsolutePath()).append("'").append(System.getProperty("line.separator")).
           append("file '").append(source2.getAbsolutePath()).append("'").append(System.getProperty("line.separator")).
@@ -120,10 +124,65 @@ ffmpeg 是依赖运行环境的，JAVE 项目封装了ffmpeg，它通过上述�
           toString();
   File mergeVideoTxt = new File("target/test-classes/material/", "mergeVideo.txt");
   FileUtils.writeStringToFile(mergeVideoTxt, data, "UTF-8", false);
-  VideoUtils.mergeVoideo(mergeVideoTxt, target, "mp4");
+  VideoUtils.mergeVideoByLossless(mergeVideoTxt, target, "mp4");
 ```
 
- 
+* 有损-合并多段视频 （注意：合并后的文件格式是mkv）
+
+```
+  File source1 = new File("target/test-classes/material/girl.mp4");
+  File source2 = new File("target/test-classes/material/man.mp4");
+  File source3 = new File("target/test-classes/material/girl.mp4");
+  File target = new File("target/test-classes/material/bbb.mkv");
+
+  LinkedList<File> files = new LinkedList<>();
+  files.add(source1);
+  files.add(source2);
+  files.add(source3);
+  VideoUtils.mergeVideoByDamaging(files, target, "mp4");
+```
+
+* 视频中插入音频（视频原本无音频）
+
+```
+  File source1 = new File("target/test-classes/material/face.mp4");
+  File source2 = new File("target/test-classes/material/wangzherongyao.wav");
+  File target = new File("target/test-classes/material/videoAndAudio.mp4");
+
+  LinkedList<File> files = new LinkedList<>();
+  files.add(source1);
+  files.add(source2);
+  VideoUtils.mergeVoideoAndAudioByInsert(files, target, null);
+```
+
+* 替换视频中的音频
+
+```
+  File source1 = new File("target/test-classes/material/girl.mp4");
+  File source2 = new File("target/test-classes/material/wangzherongyao.wav");
+  File target = new File("target/test-classes/material/videoAndAudio2.mp4");
+
+  LinkedList<File> files = new LinkedList<>();
+  files.add(source1);
+  files.add(source2);
+  VideoUtils.mergeVoideoAndAudioByReplace(files, target, "mp4");
+```
+
+* 旋转视频
+
+```
+//ps: "transpose=1" 顺时针旋转画面90度
+//ps: "transpose=2" 逆时针旋转画面90度
+//ps: "transpose=3" 顺时针旋转画面90度再水平翻转
+//ps: "transpose=0" 逆时针旋转画面90度再水平翻转
+//ps: hflip 水平翻转视频画面
+//ps: vflip 垂直翻转视频画面
+File source = new File("target/test-classes/material/girl.mp4");
+File target = new File("target/test-classes/material/girlRoate.mp4");
+VideoUtils.roateVideo(source, target, "transpose=1");
+  
+```
+
 # 参考
 
 借鉴 [JAVE](http://www.sauronsoftware.it/projects/jave/download.php) 的代码

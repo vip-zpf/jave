@@ -2,9 +2,11 @@ package it.sauronsoftware.jave.video;
 
 import it.sauronsoftware.jave.*;
 import it.sauronsoftware.jave.audio.AudioAttributes;
+import it.sauronsoftware.jave.enumers.VideoMergeTypeEnum;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.File;
+import java.util.LinkedList;
 
 /**
  * 视频相关工具
@@ -105,8 +107,8 @@ public class VideoUtils {
     /**
      * 抽取视频中的音频并转为wav格式
      *
-     * @param source
-     * @param target
+     * @param source 输入文件
+     * @param target 输出文件
      */
     public static void getVoideoAudioToWav(File source, File target) {
         AudioAttributes audio = new AudioAttributes();
@@ -125,13 +127,16 @@ public class VideoUtils {
 
 
     /**
-     * 合并多个视频
+     * 无损 合并多个视频
+     * 注意：
+     * 1、如果第一个视频没有声音，那么合并后的视频也是没有声音的
+     * 2、必须保证所有视频的格式，分辨率都一样，不然结果不可控
      *
-     * @param source
-     * @param target
-     * @param format
+     * @param source 输入文件
+     * @param target 输出文件
+     * @param format 格式
      */
-    public static void mergeVoideo(File source, File target, String format) {
+    public static void mergeVideoByLossless(File source, File target, String format) {
         String fileName = source.getName();
         String suffix = fileName.substring(fileName.lastIndexOf(".") + 1);
         if (StringUtils.isEmpty(suffix) || !"txt".equalsIgnoreCase(suffix)) {
@@ -153,7 +158,115 @@ public class VideoUtils {
         attrs.setVideoAttributes(video);
         attrs.setAudioAttributes(audio);
         try {
-            encoder.encodeMergeVideo(source, target, attrs);
+            encoder.encodeMergeVideoByLossless(source, target, attrs);
+        } catch (Exception e) {
+            throw new IllegalStateException("error: ", e);
+        }
+    }
+
+    /**
+     * 有损 合并多个视频
+     * 注意：
+     * 1、输出格式为mkv
+     *
+     * @param source 输入文件
+     * @param target 输出文件
+     * @param format 格式
+     */
+    public static void mergeVideoByDamaging(LinkedList<File> source, File target, String format) {
+        Encoder encoder = new IgnoreErrorEncoder();
+        EncodingAttributes attrs = new EncodingAttributes();
+        if (StringUtils.isNoneEmpty(format)) {
+            attrs.setFormat(format);
+        } else {
+            attrs.setFormat(format);
+        }
+        VideoAttributes video = new VideoAttributes();
+        video.setCodec("h264");
+
+        AudioAttributes audio = new AudioAttributes();
+        audio.setCodec("libmp3lame");
+
+        attrs.setVideoAttributes(video);
+        attrs.setAudioAttributes(audio);
+        try {
+            encoder.encodeMergeVideoByDamaging(source, target, attrs);
+        } catch (Exception e) {
+            throw new IllegalStateException("error: ", e);
+        }
+    }
+
+
+    //合并 视频音频 插入音频的方式
+    public static void mergeVoideoAndAudioByInsert(LinkedList<File> source, File target, String format) {
+        if (source == null || source.size()!=2) {
+            throw new RuntimeException("请传入要合并的文件");
+        }
+        Encoder encoder = new IgnoreErrorEncoder();
+        EncodingAttributes attrs = new EncodingAttributes();
+        if (StringUtils.isNoneEmpty(format)) {
+            attrs.setFormat(format);
+        } else {
+            attrs.setFormat(format);
+        }
+        VideoAttributes video = new VideoAttributes();
+        video.setMergeType(VideoMergeTypeEnum.INSERT);
+        video.setCodec(VideoAttributes.DIRECT_STREAM_COPY);
+
+        AudioAttributes audio = new AudioAttributes();
+        audio.setCodec("aac");
+
+        attrs.setVideoAttributes(video);
+        attrs.setAudioAttributes(audio);
+        try {
+            encoder.encodeMergeVideoAndAudio(source, target, attrs);
+        } catch (Exception e) {
+            throw new IllegalStateException("error: ", e);
+        }
+    }
+
+    //合并 视频音频 替换音频的方式
+    public static void mergeVoideoAndAudioByReplace(LinkedList<File> source, File target, String format) {
+        if (source == null || source.size()!=2) {
+            throw new RuntimeException("请传入要合并的文件");
+        }
+        Encoder encoder = new IgnoreErrorEncoder();
+        EncodingAttributes attrs = new EncodingAttributes();
+        if (StringUtils.isNoneEmpty(format)) {
+            attrs.setFormat(format);
+        } else {
+            attrs.setFormat(format);
+        }
+        VideoAttributes video = new VideoAttributes();
+        video.setMergeType(VideoMergeTypeEnum.REPLACE);
+        video.setCodec(VideoAttributes.DIRECT_STREAM_COPY);
+
+        AudioAttributes audio = new AudioAttributes();
+        audio.setCodec("aac");
+
+        attrs.setVideoAttributes(video);
+        attrs.setAudioAttributes(audio);
+        try {
+            encoder.encodeMergeVideoAndAudio(source, target, attrs);
+        } catch (Exception e) {
+            throw new IllegalStateException("error: ", e);
+        }
+    }
+
+    //旋转视频
+    public static void roateVideo(File source, File target, String vf) {
+        Encoder encoder = new IgnoreErrorEncoder();
+        VideoAttributes video = new VideoAttributes();
+        if (vf != null && vf.length()>0){
+            video.setVf(vf);
+        }
+        AudioAttributes audio = new AudioAttributes();
+        EncodingAttributes attrs = new EncodingAttributes();
+        attrs.setVideoAttributes(video);
+        attrs.setAudioAttributes(audio);
+
+        try {
+            encoder.encode(source, target, attrs);
         } catch (Exception e) {
             throw new IllegalStateException("error: ", e);
         }

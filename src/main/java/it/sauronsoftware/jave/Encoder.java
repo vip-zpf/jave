@@ -20,7 +20,7 @@ package it.sauronsoftware.jave;
 
 import it.sauronsoftware.jave.audio.AudioAttributes;
 import it.sauronsoftware.jave.audio.AudioInfo;
-import it.sauronsoftware.jave.enumers.MergeTypeEnum;
+import it.sauronsoftware.jave.enumers.AudioMergeTypeEnum;
 import it.sauronsoftware.jave.video.VideoAttributes;
 import it.sauronsoftware.jave.video.VideoInfo;
 import it.sauronsoftware.jave.video.VideoSize;
@@ -29,10 +29,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.Hashtable;
-import java.util.List;
-import java.util.StringTokenizer;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -824,11 +821,6 @@ public class Encoder {
 
         }
 
-        if (formatAttribute != null && formatAttribute.length() > 0) {
-            ffmpeg.addArgument("-f");
-            ffmpeg.addArgument(formatAttribute);
-        }
-
         if (videoAttributes != null &&
                 videoAttributes.getQv() != null &&
                 videoAttributes.getQv().length() > 0) {
@@ -848,6 +840,11 @@ public class Encoder {
                 audioAttributes.getAf().length() > 0) {
             ffmpeg.addArgument("-af");
             ffmpeg.addArgument(audioAttributes.getAf());
+        }
+
+        if (formatAttribute != null && formatAttribute.length() > 0) {
+            ffmpeg.addArgument("-f");
+            ffmpeg.addArgument(formatAttribute);
         }
 
         ffmpeg.addArgument("-y");
@@ -964,20 +961,20 @@ public class Encoder {
     /**
      * 主要用于合并 多个 音频文件
      *
-     * @param sourceList
-     * @param target
-     * @param attributes
-     * @throws IllegalArgumentException
-     * @throws InputFormatException
-     * @throws EncoderException
+     * @param sourceList 传入文件list
+     * @param target 转换后的文件
+     * @param attributes 属性
+     * @throws IllegalArgumentException 异常
+     * @throws InputFormatException 异常
+     * @throws EncoderException 异常
      */
-    public void encode(List<File> sourceList, File target, EncodingAttributes attributes)
+    public void encodeMergeAudio(List<File> sourceList, File target, EncodingAttributes attributes)
             throws IllegalArgumentException, InputFormatException,
             EncoderException {
-        encode(sourceList, target, attributes, null);
+        encodeMergeAudio(sourceList, target, attributes, null);
     }
 
-    public void encode(List<File> sourceList, File target, EncodingAttributes attributes,
+    public void encodeMergeAudio(List<File> sourceList, File target, EncodingAttributes attributes,
                        EncoderProgressListener listener) throws IllegalArgumentException,
             InputFormatException, EncoderException {
         String formatAttribute = attributes.getFormat();
@@ -985,7 +982,7 @@ public class Encoder {
         Float durationAttribute = attributes.getDuration();
 
         AudioAttributes audioAttributes = attributes.getAudioAttributes();
-        MergeTypeEnum mergeType = audioAttributes.getMergeType();
+        AudioMergeTypeEnum mergeType = audioAttributes.getMergeType();
 
         VideoAttributes videoAttributes = attributes.getVideoAttributes();
 
@@ -1014,7 +1011,7 @@ public class Encoder {
             ffmpeg.addArgument(String.valueOf(durationAttribute.floatValue()));
         }
         // ps: ffmpeg -i aaa.mp3 -i bbb.mp3 -filter_complex '[0:0][1:0]concat=n=2:v=0:a=1[out]' -map '[out]' output2.wav
-        if (mergeType != null && MergeTypeEnum.SPLIT_JOINT == mergeType) {
+        if (mergeType != null && AudioMergeTypeEnum.SPLIT_JOINT == mergeType) {
             ffmpeg.addArgument("-filter_complex");
             StringBuffer sb = new StringBuffer();
             for (int i = 0; i < sourceList.size(); i++) {
@@ -1029,13 +1026,181 @@ public class Encoder {
         }
 
         //ps: ffmpeg -i aaa.mp3  -i bbb.mp3 -filter_complex amix=inputs=2 c.wav
-        if (mergeType != null && MergeTypeEnum.ADMIX == mergeType) {
+        if (mergeType != null && AudioMergeTypeEnum.ADMIX == mergeType) {
             ffmpeg.addArgument("-filter_complex");
             ffmpeg.addArgument("amix=inputs=" + sourceList.size());
         }
 
-        ffmpeg.addArgument("-f");
-        ffmpeg.addArgument(formatAttribute);
+        if (formatAttribute != null) {
+            ffmpeg.addArgument("-f");
+            ffmpeg.addArgument(formatAttribute);
+        }
+
+        ffmpeg.addArgument("-y");
+        ffmpeg.addArgument(target.getAbsolutePath());
+        try {
+            ffmpeg.execute();
+        } catch (IOException e) {
+            throw new EncoderException(e);
+        }
+        try {
+            RBufferedReader reader = new RBufferedReader(new InputStreamReader(ffmpeg.getErrorStream()));
+            processErrorOutput(attributes, reader, null, listener);
+        } catch (IOException e) {
+            throw new EncoderException(e);
+        } finally {
+            ffmpeg.destroy();
+        }
+    }
+
+    /**
+     * 音频视频 合并
+     *
+     * -- 视频音频合并 视频中没有音频
+     * ffmpeg -i face.mp4 -i wangzherongyao.wav -c:v copy -c:a aac -strict experimental a12345.mp4
+     *
+     * -- 视频音频合并 用audio音频替换video中的音频
+     * ffmpeg -i girl.mp4 -i wangzherongyao.wav -c:v copy -c:a aac -strict experimental -map 0:v:0 -map 1:a:0 a123456.mp4
+     *
+     * @param files 传入文件list
+     * @param target 转换后的文件
+     * @param attributes 属性
+     * @throws IllegalArgumentException 异常
+     * @throws InputFormatException 异常
+     * @throws EncoderException 异常
+     */
+    public void encodeMergeVideoAndAudio(List<File> files, File target, EncodingAttributes attributes)
+            throws IllegalArgumentException, InputFormatException,
+            EncoderException {
+        encodeMergeVideoAndAudio(files, target, attributes, null);
+    }
+
+    public void encodeMergeVideoAndAudio(List<File> files, File target, EncodingAttributes attributes,
+                                         EncoderProgressListener listener) throws IllegalArgumentException,
+            InputFormatException, EncoderException {
+        String formatAttribute = attributes.getFormat();
+        Float offsetAttribute = attributes.getOffset();
+        Float durationAttribute = attributes.getDuration();
+        AudioAttributes audioAttributes = attributes.getAudioAttributes();
+        VideoAttributes videoAttributes = attributes.getVideoAttributes();
+        if (audioAttributes == null && videoAttributes == null) {
+            throw new IllegalArgumentException(
+                    "Both audio and video attributes are null");
+        }
+        target = target.getAbsoluteFile();
+        target.getParentFile().mkdirs();
+        FFMPEGExecutor ffmpeg = locator.createExecutor();
+
+        if (offsetAttribute != null) {
+            ffmpeg.addArgument("-ss");
+            ffmpeg.addArgument(String.valueOf(offsetAttribute.floatValue()));
+        }
+
+        for (File file : files) {
+            ffmpeg.addArgument("-i");
+            ffmpeg.addArgument(file.getAbsolutePath());
+        }
+
+        if (durationAttribute != null) {
+            ffmpeg.addArgument("-t");
+            ffmpeg.addArgument(String.valueOf(durationAttribute.floatValue()));
+        }
+        if (videoAttributes == null) {
+            ffmpeg.addArgument("-vn");
+        } else {
+            String codec = videoAttributes.getCodec();
+            if (codec != null) {
+                ffmpeg.addArgument("-vcodec");
+                ffmpeg.addArgument(codec);
+            }
+            String tag = videoAttributes.getTag();
+            if (tag != null) {
+                ffmpeg.addArgument("-vtag");
+                ffmpeg.addArgument(tag);
+            }
+            Integer bitRate = videoAttributes.getBitRate();
+            if (bitRate != null) {
+                ffmpeg.addArgument("-b");
+                ffmpeg.addArgument(String.valueOf(bitRate.intValue()));
+            }
+            Integer frameRate = videoAttributes.getFrameRate();
+            if (frameRate != null) {
+                ffmpeg.addArgument("-r");
+                ffmpeg.addArgument(String.valueOf(frameRate.intValue()));
+            }
+            VideoSize size = videoAttributes.getSize();
+            if (size != null) {
+                ffmpeg.addArgument("-s");
+                ffmpeg.addArgument(String.valueOf(size.getWidth()) + "x"
+                        + String.valueOf(size.getHeight()));
+            }
+
+            String startTime = videoAttributes.getStartTime();
+            if (startTime != null) {
+                ffmpeg.addArgument("-ss");
+                ffmpeg.addArgument(startTime);
+            }
+            String duration = videoAttributes.getDuration();
+            if (duration != null) {
+                ffmpeg.addArgument("-t");
+                ffmpeg.addArgument(duration);
+            }
+        }
+        if (audioAttributes == null) {
+            ffmpeg.addArgument("-an");
+        } else {
+            String codec = audioAttributes.getCodec();
+            if (codec != null) {
+                ffmpeg.addArgument("-acodec");
+                ffmpeg.addArgument(codec);
+            }
+            Integer bitRate = audioAttributes.getBitRate();
+            if (bitRate != null) {
+                ffmpeg.addArgument("-ab");
+                ffmpeg.addArgument(String.valueOf(bitRate.intValue()));
+            }
+            Integer channels = audioAttributes.getChannels();
+            if (channels != null) {
+                ffmpeg.addArgument("-ac");
+                ffmpeg.addArgument(String.valueOf(channels.intValue()));
+            }
+            Integer samplingRate = audioAttributes.getSamplingRate();
+            if (samplingRate != null) {
+                ffmpeg.addArgument("-ar");
+                ffmpeg.addArgument(String.valueOf(samplingRate.intValue()));
+            }
+            Integer volume = audioAttributes.getVolume();
+            if (volume != null) {
+                ffmpeg.addArgument("-vol");
+                ffmpeg.addArgument(String.valueOf(volume.intValue()));
+            }
+            String startTime = audioAttributes.getStartTime();
+            if (startTime != null) {
+                ffmpeg.addArgument("-ss");
+                ffmpeg.addArgument(startTime);
+            }
+            String duration = audioAttributes.getDuration();
+            if (duration != null) {
+                ffmpeg.addArgument("-t");
+                ffmpeg.addArgument(duration);
+            }
+
+        }
+        ffmpeg.addArgument("-strict");
+        ffmpeg.addArgument("experimental");
+
+        if (videoAttributes != null && videoAttributes.getMergeType().getIndex()==2){
+            ffmpeg.addArgument("-map");
+            ffmpeg.addArgument("0:v:0");
+
+            ffmpeg.addArgument("-map");
+            ffmpeg.addArgument("1:a:0");
+        }
+
+        if (formatAttribute != null) {
+            ffmpeg.addArgument("-f");
+            ffmpeg.addArgument(formatAttribute);
+        }
         ffmpeg.addArgument("-y");
         ffmpeg.addArgument(target.getAbsolutePath());
         try {
@@ -1054,15 +1219,197 @@ public class Encoder {
     }
 
 
-    public void encodeMergeVideo(File txtFile, File target, EncodingAttributes attributes)
+    /**
+     * 有损合并视频
+     * 注意：
+     * 1、输出格式为mkv
+     * ps：ffmpeg -i girl.mp4 -i girl.mp4 -i man.mp4  -filter_complex '[0:0] [0:1] [1:0] [1:1] [2:0] [2:1] concat=n=3:v=1:a=1 [v] [a]' -map '[v]' -map '[a]' -vcodec h264  -acodec libmp3lame -f mp4 -y output.mkv
+     *
+     * @param files 传入文件list
+     * @param target 转换后的文件
+     * @param attributes 属性
+     * @throws IllegalArgumentException 异常
+     * @throws InputFormatException 异常
+     * @throws EncoderException 异常
+     */
+    public void encodeMergeVideoByDamaging(List<File> files, File target, EncodingAttributes attributes)
             throws IllegalArgumentException, InputFormatException,
             EncoderException {
-        encodeMergeVideo(txtFile, target, attributes, null);
+        encodeMergeVideoByDamaging(files, target, attributes, null);
     }
 
 
-    public void encodeMergeVideo(File txtFile, File target, EncodingAttributes attributes,
-                                 EncoderProgressListener listener) throws IllegalArgumentException,
+    public void encodeMergeVideoByDamaging(List<File> files, File target, EncodingAttributes attributes,
+                                           EncoderProgressListener listener) throws IllegalArgumentException,
+            InputFormatException, EncoderException {
+        String formatAttribute = attributes.getFormat();
+        Float offsetAttribute = attributes.getOffset();
+        Float durationAttribute = attributes.getDuration();
+        AudioAttributes audioAttributes = attributes.getAudioAttributes();
+        VideoAttributes videoAttributes = attributes.getVideoAttributes();
+        if (audioAttributes == null && videoAttributes == null) {
+            throw new IllegalArgumentException("Both audio and video attributes are null");
+        }
+        target = target.getAbsoluteFile();
+        target.getParentFile().mkdirs();
+        FFMPEGExecutor ffmpeg = locator.createExecutor();
+
+        if (offsetAttribute != null) {
+            ffmpeg.addArgument("-ss");
+            ffmpeg.addArgument(String.valueOf(offsetAttribute.floatValue()));
+        }
+        if (files == null || files.size() == 0) {
+            throw new IllegalArgumentException("请传入要合并的文件");
+        }
+        for (File file : files) {
+            ffmpeg.addArgument("-i");
+            ffmpeg.addArgument(file.getAbsolutePath());
+        }
+
+        ffmpeg.addArgument("-filter_complex");
+        StringBuffer sb = new StringBuffer();
+        for (int i = 0; i < files.size(); i++) {
+            sb.append("[").append(i).append(":0] ");
+            sb.append("[").append(i).append(":1] ");
+        }
+        sb.append("concat=n=").append(files.size()).append(":v=1:a=1 [v] [a]");
+        ffmpeg.addArgument(sb.toString());
+
+        ffmpeg.addArgument("-map");
+        ffmpeg.addArgument("[v]");
+
+        ffmpeg.addArgument("-map");
+        ffmpeg.addArgument("[a]");
+
+        if (durationAttribute != null) {
+            ffmpeg.addArgument("-t");
+            ffmpeg.addArgument(String.valueOf(durationAttribute.floatValue()));
+        }
+        if (videoAttributes == null) {
+            ffmpeg.addArgument("-vn");
+        } else {
+            String codec = videoAttributes.getCodec();
+            if (codec != null) {
+                ffmpeg.addArgument("-vcodec");
+                ffmpeg.addArgument(codec);
+            }
+            String tag = videoAttributes.getTag();
+            if (tag != null) {
+                ffmpeg.addArgument("-vtag");
+                ffmpeg.addArgument(tag);
+            }
+            Integer bitRate = videoAttributes.getBitRate();
+            if (bitRate != null) {
+                ffmpeg.addArgument("-b");
+                ffmpeg.addArgument(String.valueOf(bitRate.intValue()));
+            }
+            Integer frameRate = videoAttributes.getFrameRate();
+            if (frameRate != null) {
+                ffmpeg.addArgument("-r");
+                ffmpeg.addArgument(String.valueOf(frameRate.intValue()));
+            }
+            VideoSize size = videoAttributes.getSize();
+            if (size != null) {
+                ffmpeg.addArgument("-s");
+                ffmpeg.addArgument(String.valueOf(size.getWidth()) + "x"
+                        + String.valueOf(size.getHeight()));
+            }
+
+            String startTime = videoAttributes.getStartTime();
+            if (startTime != null) {
+                ffmpeg.addArgument("-ss");
+                ffmpeg.addArgument(startTime);
+            }
+            String duration = videoAttributes.getDuration();
+            if (duration != null) {
+                ffmpeg.addArgument("-t");
+                ffmpeg.addArgument(duration);
+            }
+        }
+        if (audioAttributes == null) {
+            ffmpeg.addArgument("-an");
+        } else {
+            String codec = audioAttributes.getCodec();
+            if (codec != null) {
+                ffmpeg.addArgument("-acodec");
+                ffmpeg.addArgument(codec);
+            }
+            Integer bitRate = audioAttributes.getBitRate();
+            if (bitRate != null) {
+                ffmpeg.addArgument("-ab");
+                ffmpeg.addArgument(String.valueOf(bitRate.intValue()));
+            }
+            Integer channels = audioAttributes.getChannels();
+            if (channels != null) {
+                ffmpeg.addArgument("-ac");
+                ffmpeg.addArgument(String.valueOf(channels.intValue()));
+            }
+            Integer samplingRate = audioAttributes.getSamplingRate();
+            if (samplingRate != null) {
+                ffmpeg.addArgument("-ar");
+                ffmpeg.addArgument(String.valueOf(samplingRate.intValue()));
+            }
+            Integer volume = audioAttributes.getVolume();
+            if (volume != null) {
+                ffmpeg.addArgument("-vol");
+                ffmpeg.addArgument(String.valueOf(volume.intValue()));
+            }
+            String startTime = audioAttributes.getStartTime();
+            if (startTime != null) {
+                ffmpeg.addArgument("-ss");
+                ffmpeg.addArgument(startTime);
+            }
+            String duration = audioAttributes.getDuration();
+            if (duration != null) {
+                ffmpeg.addArgument("-t");
+                ffmpeg.addArgument(duration);
+            }
+
+        }
+        if (formatAttribute != null) {
+            ffmpeg.addArgument("-f");
+            ffmpeg.addArgument(formatAttribute);
+        }
+        ffmpeg.addArgument("-y");
+        ffmpeg.addArgument(target.getAbsolutePath());
+        try {
+            ffmpeg.execute();
+        } catch (IOException e) {
+            throw new EncoderException(e);
+        }
+        try {
+            RBufferedReader reader = new RBufferedReader(new InputStreamReader(ffmpeg.getErrorStream()));
+            processErrorOutput(attributes, reader, null, listener);
+        } catch (IOException e) {
+            throw new EncoderException(e);
+        } finally {
+            ffmpeg.destroy();
+        }
+    }
+
+
+    /**
+     * 无损合并视频
+     * 注意：
+     * 1、如果第一个视频没有声音，那么合并后的视频也是没有声音的
+     * 2、必须保证所有视频的格式，分辨率都一样，不然结果不可控
+     *
+     * @param txtFile 传入文本文件
+     * @param target 转换后的文件
+     * @param attributes 属性
+     * @throws IllegalArgumentException 异常
+     * @throws InputFormatException 异常
+     * @throws EncoderException 异常
+     */
+    public void encodeMergeVideoByLossless(File txtFile, File target, EncodingAttributes attributes)
+            throws IllegalArgumentException, InputFormatException,
+            EncoderException {
+        encodeMergeVideoByLossless(txtFile, target, attributes, null);
+    }
+
+
+    public void encodeMergeVideoByLossless(File txtFile, File target, EncodingAttributes attributes,
+                                           EncoderProgressListener listener) throws IllegalArgumentException,
             InputFormatException, EncoderException {
         String formatAttribute = attributes.getFormat();
         Float offsetAttribute = attributes.getOffset();
@@ -1175,8 +1522,10 @@ public class Encoder {
             }
 
         }
-        ffmpeg.addArgument("-f");
-        ffmpeg.addArgument(formatAttribute);
+        if (formatAttribute != null) {
+            ffmpeg.addArgument("-f");
+            ffmpeg.addArgument(formatAttribute);
+        }
         ffmpeg.addArgument("-y");
         ffmpeg.addArgument(target.getAbsolutePath());
         try {

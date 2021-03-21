@@ -18,7 +18,7 @@
  */
 package it.sauronsoftware.jave.audio;
 
-import it.sauronsoftware.jave.enumers.MergeTypeEnum;
+import it.sauronsoftware.jave.enumers.AudioMergeTypeEnum;
 import lombok.Data;
 
 @Data
@@ -74,7 +74,7 @@ public class AudioAttributes {
 	/**
 	 * 合并类型
 	 */
-	private MergeTypeEnum mergeType;
+	private AudioMergeTypeEnum mergeType;
 
 	/**
 	 * filter_graph 过滤视图

@@ -1,7 +1,7 @@
 package it.sauronsoftware.jave.audio;
 
 import it.sauronsoftware.jave.*;
-import it.sauronsoftware.jave.enumers.MergeTypeEnum;
+import it.sauronsoftware.jave.enumers.AudioMergeTypeEnum;
 
 import java.io.File;
 import java.util.List;
@@ -117,7 +117,7 @@ public class AudioUtils {
         }
         Encoder encoder = new IgnoreErrorEncoder();
         try {
-            encoder.encode(sourceList, target, attrs);
+            encoder.encodeMergeAudio(sourceList, target, attrs);
         } catch (EncoderException e) {
             throw new IllegalStateException("operate error: ", e);
         }
@@ -125,7 +125,7 @@ public class AudioUtils {
 
     public static void defultMergeAudio(List<File> sourceList, File target) {
         AudioAttributes audioAttributes = new AudioAttributes();
-        audioAttributes.setMergeType(MergeTypeEnum.SPLIT_JOINT);
+        audioAttributes.setMergeType(AudioMergeTypeEnum.SPLIT_JOINT);
 
         EncodingAttributes attrs = new EncodingAttributes();
         attrs.setFormat("wav");
@@ -133,7 +133,7 @@ public class AudioUtils {
 
         Encoder encoder = new IgnoreErrorEncoder();
         try {
-            encoder.encode(sourceList, target, attrs);
+            encoder.encodeMergeAudio(sourceList, target, attrs);
         } catch (EncoderException e) {
             throw new IllegalStateException("operate error: ", e);
         }

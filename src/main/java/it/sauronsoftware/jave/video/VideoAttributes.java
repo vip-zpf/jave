@@ -18,6 +18,7 @@
  */
 package it.sauronsoftware.jave.video;
 
+import it.sauronsoftware.jave.enumers.VideoMergeTypeEnum;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -74,7 +75,14 @@ public class VideoAttributes implements Serializable {
     /**
      * filter_graph 过滤视图
      * set video filters 用来设置视频过滤器 简称：vf
+     *
      * ps：fps=1/20 每隔20秒截取一张
+     * ps: "transpose=1" 顺时针旋转画面90度
+     * ps: "transpose=2" 逆时针旋转画面90度
+     * ps: "transpose=3" 顺时针旋转画面90度再水平翻转
+     * ps: "transpose=0" 逆时针旋转画面90度再水平翻转
+     * ps: hflip 水平翻转视频画面
+     * ps: vflip 垂直翻转视频画面
      */
     private String vf;
 
@@ -83,5 +91,10 @@ public class VideoAttributes implements Serializable {
      * to control output quality. Full range is a linear scale of 1-31 where a lower value results in a higher quality. 2-5 is a good range to try.
      */
     private String qv;
+
+    /**
+     * 合并类型
+     */
+    private VideoMergeTypeEnum mergeType;
 
 }

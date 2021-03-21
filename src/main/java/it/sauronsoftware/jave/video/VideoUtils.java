@@ -1,9 +1,6 @@
 package it.sauronsoftware.jave.video;
 
-import it.sauronsoftware.jave.Encoder;
-import it.sauronsoftware.jave.EncoderException;
-import it.sauronsoftware.jave.EncodingAttributes;
-import it.sauronsoftware.jave.IgnoreErrorEncoder;
+import it.sauronsoftware.jave.*;
 import it.sauronsoftware.jave.audio.AudioAttributes;
 import org.apache.commons.lang3.StringUtils;
 
@@ -130,5 +127,16 @@ public class VideoUtils {
         } catch (Exception e) {
             throw new IllegalStateException("error: ", e);
         }
+    }
+
+    public static MultimediaInfo getVideoInfo(File source) {
+        Encoder encoder = new IgnoreErrorEncoder();
+        MultimediaInfo info = null;
+        try {
+            info = encoder.getInfo(source);
+        } catch (EncoderException e) {
+            e.printStackTrace();
+        }
+        return info;
     }
 }

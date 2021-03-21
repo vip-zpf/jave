@@ -1,5 +1,7 @@
 package it.sauronsoftware.jave;
 
+import it.sauronsoftware.jave.audio.AudioAttributes;
+import it.sauronsoftware.jave.video.VideoAttributes;
 import it.sauronsoftware.jave.video.VideoUtils;
 import org.apache.commons.io.FileUtils;
 import org.junit.Test;
@@ -58,6 +60,20 @@ public class VideoTest {
         FileUtils.writeStringToFile(mergeVideoTxt, data, "UTF-8", false);
         VideoUtils.mergeVoideo(mergeVideoTxt, target, "mp4");
     }
+
+
+    @Test
+    public void fomart() {
+        File source = new File("target/test-classes/material/123.mp4");
+        File target = new File("target/test-classes/material/123.avi");
+        EncodingAttributes attrs = new EncodingAttributes();
+        attrs.setFormat("avi");
+        attrs.setVideoAttributes(new VideoAttributes());
+        attrs.setAudioAttributes(new AudioAttributes());
+        VideoUtils.getVoideoAudio(source,target,attrs);
+    }
+
+
 
 
 }

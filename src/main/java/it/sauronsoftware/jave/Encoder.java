@@ -823,10 +823,29 @@ public class Encoder {
             }
 
         }
-        ffmpeg.addArgument("-f");
-        ffmpeg.addArgument(formatAttribute);
+        if (formatAttribute != null && formatAttribute.length()>0){
+            ffmpeg.addArgument("-f");
+            ffmpeg.addArgument(formatAttribute);
+        }
+
+        if (videoAttributes.getQ()!= null && videoAttributes.getQ().length()>0){
+            ffmpeg.addArgument("-q");
+            ffmpeg.addArgument(videoAttributes.getQ());
+        }
+
+        if (videoAttributes.getVf()!= null && videoAttributes.getVf().length()>0){
+            ffmpeg.addArgument("-vf");
+            ffmpeg.addArgument(videoAttributes.getVf());
+        }
+
+        if (audioAttributes.getAf()!= null && audioAttributes.getAf().length()>0){
+            ffmpeg.addArgument("-af");
+            ffmpeg.addArgument(audioAttributes.getAf());
+        }
+
         ffmpeg.addArgument("-y");
         ffmpeg.addArgument(target.getAbsolutePath());
+
         try {
             ffmpeg.execute();
         } catch (IOException e) {

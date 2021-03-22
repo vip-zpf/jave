@@ -298,6 +298,28 @@ public class VideoUtils {
         }
     }
 
+    //webm转mp4
+    public static void webm2mp4(File source, File target, String fflags, Integer frameRate) {
+        Encoder encoder = new IgnoreErrorEncoder();
+        VideoAttributes video = new VideoAttributes();
+        video.setFrameRate(24);
+        if (frameRate != null) {
+            video.setFrameRate(frameRate);
+        }
+
+        EncodingAttributes attrs = new EncodingAttributes();
+        attrs.setFflags("+genpts");
+        attrs.setVideoAttributes(video);
+        if (fflags != null && fflags.length() > 0) {
+            attrs.setFflags(fflags);
+        }
+        try {
+            encoder.encode(source, target, attrs);
+        } catch (Exception e) {
+            throw new IllegalStateException("error: ", e);
+        }
+    }
+
     public static MultimediaInfo getVideoInfo(File source) {
         Encoder encoder = new IgnoreErrorEncoder();
         MultimediaInfo info = null;

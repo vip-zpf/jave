@@ -733,6 +733,10 @@ public class Encoder {
             ffmpeg.addArgument("-ss");
             ffmpeg.addArgument(String.valueOf(offsetAttribute.floatValue()));
         }
+        if (attributes.getFflags() != null && attributes.getFflags().length() > 0) {
+            ffmpeg.addArgument("-fflags");
+            ffmpeg.addArgument(attributes.getFflags());
+        }
         ffmpeg.addArgument("-i");
         ffmpeg.addArgument(source.getAbsolutePath());
         if (durationAttribute != null) {
@@ -983,11 +987,11 @@ public class Encoder {
      * 主要用于合并 多个 音频文件
      *
      * @param sourceList 传入文件list
-     * @param target 转换后的文件
+     * @param target     转换后的文件
      * @param attributes 属性
      * @throws IllegalArgumentException 异常
-     * @throws InputFormatException 异常
-     * @throws EncoderException 异常
+     * @throws InputFormatException     异常
+     * @throws EncoderException         异常
      */
     public void encodeMergeAudio(List<File> sourceList, File target, EncodingAttributes attributes)
             throws IllegalArgumentException, InputFormatException,
@@ -996,7 +1000,7 @@ public class Encoder {
     }
 
     public void encodeMergeAudio(List<File> sourceList, File target, EncodingAttributes attributes,
-                       EncoderProgressListener listener) throws IllegalArgumentException,
+                                 EncoderProgressListener listener) throws IllegalArgumentException,
             InputFormatException, EncoderException {
         String formatAttribute = attributes.getFormat();
         Float offsetAttribute = attributes.getOffset();
@@ -1076,19 +1080,19 @@ public class Encoder {
 
     /**
      * 音频视频 合并
-     *
+     * <p>
      * -- 视频音频合并 视频中没有音频
      * ffmpeg -i face.mp4 -i wangzherongyao.wav -c:v copy -c:a aac -strict experimental a12345.mp4
-     *
+     * <p>
      * -- 视频音频合并 用audio音频替换video中的音频
      * ffmpeg -i girl.mp4 -i wangzherongyao.wav -c:v copy -c:a aac -strict experimental -map 0:v:0 -map 1:a:0 a123456.mp4
      *
-     * @param files 传入文件list
-     * @param target 转换后的文件
+     * @param files      传入文件list
+     * @param target     转换后的文件
      * @param attributes 属性
      * @throws IllegalArgumentException 异常
-     * @throws InputFormatException 异常
-     * @throws EncoderException 异常
+     * @throws InputFormatException     异常
+     * @throws EncoderException         异常
      */
     public void encodeMergeVideoAndAudio(List<File> files, File target, EncodingAttributes attributes)
             throws IllegalArgumentException, InputFormatException,
@@ -1210,7 +1214,7 @@ public class Encoder {
         ffmpeg.addArgument("-strict");
         ffmpeg.addArgument("experimental");
 
-        if (videoAttributes != null && videoAttributes.getMergeType().getIndex()==2){
+        if (videoAttributes != null && videoAttributes.getMergeType().getIndex() == 2) {
             ffmpeg.addArgument("-map");
             ffmpeg.addArgument("0:v:0");
 
@@ -1246,12 +1250,12 @@ public class Encoder {
      * 1、输出格式为mkv
      * ps：ffmpeg -i girl.mp4 -i girl.mp4 -i man.mp4  -filter_complex '[0:0] [0:1] [1:0] [1:1] [2:0] [2:1] concat=n=3:v=1:a=1 [v] [a]' -map '[v]' -map '[a]' -vcodec h264  -acodec libmp3lame -f mp4 -y output.mkv
      *
-     * @param files 传入文件list
-     * @param target 转换后的文件
+     * @param files      传入文件list
+     * @param target     转换后的文件
      * @param attributes 属性
      * @throws IllegalArgumentException 异常
-     * @throws InputFormatException 异常
-     * @throws EncoderException 异常
+     * @throws InputFormatException     异常
+     * @throws EncoderException         异常
      */
     public void encodeMergeVideoByDamaging(List<File> files, File target, EncodingAttributes attributes)
             throws IllegalArgumentException, InputFormatException,
@@ -1415,12 +1419,12 @@ public class Encoder {
      * 1、如果第一个视频没有声音，那么合并后的视频也是没有声音的
      * 2、必须保证所有视频的格式，分辨率都一样，不然结果不可控
      *
-     * @param txtFile 传入文本文件
-     * @param target 转换后的文件
+     * @param txtFile    传入文本文件
+     * @param target     转换后的文件
      * @param attributes 属性
      * @throws IllegalArgumentException 异常
-     * @throws InputFormatException 异常
-     * @throws EncoderException 异常
+     * @throws InputFormatException     异常
+     * @throws EncoderException         异常
      */
     public void encodeMergeVideoByLossless(File txtFile, File target, EncodingAttributes attributes)
             throws IllegalArgumentException, InputFormatException,

@@ -67,4 +67,9 @@ public class EncodingAttributes implements Serializable {
 	 */
 	private VideoAttributes videoAttributes = null;
 
+	/**
+	 * ps: +genpts  生成pts
+	 */
+	private String fflags;
+
 }

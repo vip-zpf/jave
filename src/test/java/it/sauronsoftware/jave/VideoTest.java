@@ -116,10 +116,17 @@ public class VideoTest {
 
 
     @Test
-    public void webm2MP4() {
+    public void webm2MP4One() {
         File source = new File("target/test-classes/material/abc.webm");
         File target = new File("target/test-classes/material/webm2MP4.mp4");
-        VideoUtils.webm2mp4(source, target, "2000k","2000k","2500k");
+        VideoUtils.webm2mp4(source, target, "2000k", "2000k", "2500k");
+    }
+
+    @Test
+    public void webm2MP4Two() {
+        File source = new File("target/test-classes/material/abc.webm");
+        File target = new File("target/test-classes/material/webm2MP4.mp4");
+        VideoUtils.webm2mp4(source, target, null, null);
     }
 
     @Test
@@ -130,6 +137,6 @@ public class VideoTest {
         attrs.setFormat("avi");
         attrs.setVideoAttributes(new VideoAttributes());
         attrs.setAudioAttributes(new AudioAttributes());
-        VideoUtils.getVoideoAudio(source,target,attrs);
+        VideoUtils.getVoideoAudio(source, target, attrs);
     }
 }

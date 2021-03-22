@@ -835,6 +835,27 @@ public class Encoder {
             ffmpeg.addArgument(videoAttributes.getVf());
         }
 
+        if (videoAttributes != null &&
+                videoAttributes.getBv() != null &&
+                videoAttributes.getBv().length() > 0) {
+            ffmpeg.addArgument("-b:v");
+            ffmpeg.addArgument(videoAttributes.getBv());
+        }
+
+        if (videoAttributes != null &&
+                videoAttributes.getBufsize() != null &&
+                videoAttributes.getBufsize().length() > 0) {
+            ffmpeg.addArgument("-bufsize");
+            ffmpeg.addArgument(videoAttributes.getBufsize());
+        }
+
+        if (videoAttributes != null &&
+                videoAttributes.getMaxrate() != null &&
+                videoAttributes.getMaxrate().length() > 0) {
+            ffmpeg.addArgument("-maxrate");
+            ffmpeg.addArgument(videoAttributes.getMaxrate());
+        }
+
         if (audioAttributes != null &&
                 audioAttributes.getAf() != null &&
                 audioAttributes.getAf().length() > 0) {

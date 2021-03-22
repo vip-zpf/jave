@@ -83,7 +83,7 @@ public class VideoTest {
     //视频中插入音频（视频原本无音频）
     @Test
     public void mergeVideoAndVideoByInsert() throws EncoderException, IOException {
-        File source1 = new File("target/test-classes/material/face.mp4");
+        File source1 = new File("target/test-classes/material/girl.mp4");
         File source2 = new File("target/test-classes/material/wangzherongyao.wav");
         File target = new File("target/test-classes/material/videoAndAudio.mp4");
 
@@ -114,6 +114,13 @@ public class VideoTest {
         VideoUtils.roateVideo(source, target, "transpose=1");
     }
 
+
+    @Test
+    public void webm2MP4() {
+        File source = new File("target/test-classes/material/abc.webm");
+        File target = new File("target/test-classes/material/webm2MP4.mp4");
+        VideoUtils.webm2mp4(source, target, "2000k","2000k","2500k");
+    }
 
     @Test
     public void fomart() {

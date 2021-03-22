@@ -12,7 +12,7 @@
 <dependency>
     <groupId>com.github.vip-zpf</groupId>
     <artifactId>jave</artifactId>
-    <version>1.0.3</version>
+    <version>1.0.6</version>
 </dependency>
 ```
 
@@ -182,6 +182,16 @@ File target = new File("target/test-classes/material/girlRoate.mp4");
 VideoUtils.roateVideo(source, target, "transpose=1");
   
 ```
+
+* webm转mp4
+
+```
+File source = new File("target/test-classes/material/abc.webm");
+File target = new File("target/test-classes/material/webm2MP4.mp4");
+VideoUtils.webm2mp4(source, target, "2000k","2000k","2500k");
+```
+
+
 
 # 参考
 

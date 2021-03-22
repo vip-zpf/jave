@@ -21,7 +21,7 @@ public class VideoUtils {
      * @param imageTargetPath 缩略图存放目标文件
      */
     public static void thumbnailByOneFramePerSecond(File source, File imageTargetPath) {
-        thumbnail(source, imageTargetPath, 1, null, null, null,"2");
+        thumbnail(source, imageTargetPath, 1, null, null, null, "2");
     }
 
     /**
@@ -31,7 +31,7 @@ public class VideoUtils {
      * @param imageTargetPath 缩略图存放目标文件
      */
     public static void thumbnailByOneFrameEveryFiveSeconds(File source, File imageTargetPath) {
-        thumbnail(source, imageTargetPath, 1, 5d, null, null,null);
+        thumbnail(source, imageTargetPath, 1, 5d, null, null, null);
     }
 
     /**
@@ -41,7 +41,7 @@ public class VideoUtils {
      * @param imageTargetPath 缩略图存放目标文件
      */
     public static void thumbnailByOneFrameEveryFiveSecondsAndStartTime(File source, File imageTargetPath, String startTime, String duration) {
-        thumbnail(source, imageTargetPath, 1, 5d, startTime, duration,null);
+        thumbnail(source, imageTargetPath, 1, 5d, startTime, duration, null);
     }
 
     /**
@@ -53,7 +53,7 @@ public class VideoUtils {
      * @param intervalTime    间隔时间（每隔多少秒抽取几帧）
      * @param startTime       开始时间（从什么时间开始操作）
      * @param duration        持续时长
-     * @param qv               设置图片质量
+     * @param qv              设置图片质量
      */
     public static void thumbnail(File source, File imageTargetPath, Integer frameRate, Double intervalTime, String startTime, String duration, String qv) {
         Encoder encoder = new IgnoreErrorEncoder();
@@ -71,7 +71,7 @@ public class VideoUtils {
         if (duration != null) {
             video.setDuration(duration);
         }
-        if (qv != null && qv.length()>0){
+        if (qv != null && qv.length() > 0) {
             video.setQv(qv);
         }
         EncodingAttributes attrs = new EncodingAttributes();
@@ -199,7 +199,7 @@ public class VideoUtils {
 
     //合并 视频音频 插入音频的方式
     public static void mergeVoideoAndAudioByInsert(LinkedList<File> source, File target, String format) {
-        if (source == null || source.size()!=2) {
+        if (source == null || source.size() != 2) {
             throw new RuntimeException("请传入要合并的文件");
         }
         Encoder encoder = new IgnoreErrorEncoder();
@@ -227,7 +227,7 @@ public class VideoUtils {
 
     //合并 视频音频 替换音频的方式
     public static void mergeVoideoAndAudioByReplace(LinkedList<File> source, File target, String format) {
-        if (source == null || source.size()!=2) {
+        if (source == null || source.size() != 2) {
             throw new RuntimeException("请传入要合并的文件");
         }
         Encoder encoder = new IgnoreErrorEncoder();
@@ -257,7 +257,7 @@ public class VideoUtils {
     public static void roateVideo(File source, File target, String vf) {
         Encoder encoder = new IgnoreErrorEncoder();
         VideoAttributes video = new VideoAttributes();
-        if (vf != null && vf.length()>0){
+        if (vf != null && vf.length() > 0) {
             video.setVf(vf);
         }
         AudioAttributes audio = new AudioAttributes();
@@ -265,6 +265,32 @@ public class VideoUtils {
         attrs.setVideoAttributes(video);
         attrs.setAudioAttributes(audio);
 
+        try {
+            encoder.encode(source, target, attrs);
+        } catch (Exception e) {
+            throw new IllegalStateException("error: ", e);
+        }
+    }
+
+    //webm转mp4
+    public static void webm2mp4(File source, File target, String bv, String bufsize, String maxrate) {
+        Encoder encoder = new IgnoreErrorEncoder();
+        VideoAttributes video = new VideoAttributes();
+        video.setBv("2000k");
+        video.setBufsize("2000k");
+        video.setMaxrate("2500k");
+
+        if (bv != null && bv.length() > 0) {
+            video.setBv(bv);
+        }
+        if (bufsize != null && bufsize.length() > 0) {
+            video.setBufsize(bufsize);
+        }
+        if (maxrate != null && maxrate.length() > 0) {
+            video.setMaxrate(maxrate);
+        }
+        EncodingAttributes attrs = new EncodingAttributes();
+        attrs.setVideoAttributes(video);
         try {
             encoder.encode(source, target, attrs);
         } catch (Exception e) {

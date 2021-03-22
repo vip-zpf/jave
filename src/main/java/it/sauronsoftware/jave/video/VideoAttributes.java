@@ -93,8 +93,28 @@ public class VideoAttributes implements Serializable {
     private String qv;
 
     /**
+     * 控制平均码率，希望视频清晰一些可以调大一些
+     * ps:2000k
+     */
+    private String bv;
+
+    /**
+     *设置码率控制缓冲器区间，根据需要可以调整
+     * ps:2000k
+     */
+    private String bufsize;
+
+    /**
+     *视频最大码率，主要是为了控制文件大小。
+     * ps:2500k
+     */
+    private String maxrate;
+
+    /**
      * 合并类型
      */
     private VideoMergeTypeEnum mergeType;
+
+
 
 }

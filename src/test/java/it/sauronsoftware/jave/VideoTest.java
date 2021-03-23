@@ -106,12 +106,20 @@ public class VideoTest {
         VideoUtils.mergeVoideoAndAudioByReplace(files, target, "mp4");
     }
 
-    //旋转视频
+    //旋转视频 重新编码
     @Test
     public void roateVideo() {
         File source = new File("target/test-classes/material/girl.mp4");
         File target = new File("target/test-classes/material/girlRoate.mp4");
         VideoUtils.roateVideo(source, target, "transpose=1");
+    }
+
+    //旋转视频 简单快速
+    @Test
+    public void roateVideoByMetadata() {
+        File source = new File("target/test-classes/material/girl.mp4");
+        File target = new File("target/test-classes/material/girlRoate.mp4");
+        VideoUtils.roateVideoByMetadata(source, target, "rotate=90");
     }
 
 
@@ -139,4 +147,5 @@ public class VideoTest {
         attrs.setAudioAttributes(new AudioAttributes());
         VideoUtils.getVoideoAudio(source, target, attrs);
     }
+
 }

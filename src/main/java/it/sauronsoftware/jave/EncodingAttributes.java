@@ -72,4 +72,6 @@ public class EncodingAttributes implements Serializable {
 	 */
 	private String fflags;
 
+	private String metadataSv;
+
 }

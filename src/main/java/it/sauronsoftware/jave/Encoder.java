@@ -737,8 +737,14 @@ public class Encoder {
             ffmpeg.addArgument("-fflags");
             ffmpeg.addArgument(attributes.getFflags());
         }
+
         ffmpeg.addArgument("-i");
         ffmpeg.addArgument(source.getAbsolutePath());
+
+        if (attributes.getMetadataSv() != null && attributes.getMetadataSv().length()>0){
+            ffmpeg.addArgument("-metadata:s:v");
+            ffmpeg.addArgument(attributes.getMetadataSv());
+        }
         if (durationAttribute != null) {
             ffmpeg.addArgument("-t");
             ffmpeg.addArgument(String.valueOf(durationAttribute.floatValue()));

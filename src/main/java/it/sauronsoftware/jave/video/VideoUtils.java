@@ -272,6 +272,26 @@ public class VideoUtils {
         }
     }
 
+    //旋转视频 简单快速
+    public static void roateVideoByMetadata(File source, File target, String rotate) {
+        Encoder encoder = new IgnoreErrorEncoder();
+        VideoAttributes video = new VideoAttributes();
+        video.setCodec(VideoAttributes.DIRECT_STREAM_COPY);
+        AudioAttributes audio = new AudioAttributes();
+        audio.setCodec(AudioAttributes.DIRECT_STREAM_COPY);
+        EncodingAttributes attrs = new EncodingAttributes();
+        if (rotate != null && rotate.length() > 0) {
+            attrs.setMetadataSv(rotate);
+        }
+        attrs.setVideoAttributes(video);
+        attrs.setAudioAttributes(audio);
+        try {
+            encoder.encode(source, target, attrs);
+        } catch (Exception e) {
+            throw new IllegalStateException("error: ", e);
+        }
+    }
+
     //webm转mp4
     public static void webm2mp4(File source, File target, String bv, String bufsize, String maxrate) {
         Encoder encoder = new IgnoreErrorEncoder();

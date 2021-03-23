@@ -168,7 +168,7 @@ ffmpeg 是依赖运行环境的，JAVE 项目封装了ffmpeg，它通过上述�
   VideoUtils.mergeVoideoAndAudioByReplace(files, target, "mp4");
 ```
 
-* 旋转视频
+* 旋转视频 一
 
 ```
 //ps: "transpose=1" 顺时针旋转画面90度
@@ -181,6 +181,14 @@ File source = new File("target/test-classes/material/girl.mp4");
 File target = new File("target/test-classes/material/girlRoate.mp4");
 VideoUtils.roateVideo(source, target, "transpose=1");
   
+```
+
+* 旋转视频 二
+
+```
+File source = new File("target/test-classes/material/girl.mp4");
+File target = new File("target/test-classes/material/girlRoate.mp4");
+VideoUtils.roateVideoByMetadata(source, target, "rotate=90");
 ```
 
 * webm转mp4 一

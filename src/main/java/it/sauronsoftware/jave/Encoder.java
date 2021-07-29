@@ -741,7 +741,7 @@ public class Encoder {
         ffmpeg.addArgument("-i");
         ffmpeg.addArgument(source.getAbsolutePath());
 
-        if (attributes.getMetadataSv() != null && attributes.getMetadataSv().length()>0){
+        if (attributes.getMetadataSv() != null && attributes.getMetadataSv().length() > 0) {
             ffmpeg.addArgument("-metadata:s:v");
             ffmpeg.addArgument(attributes.getMetadataSv());
         }
@@ -1060,6 +1060,11 @@ public class Encoder {
         if (mergeType != null && AudioMergeTypeEnum.ADMIX == mergeType) {
             ffmpeg.addArgument("-filter_complex");
             ffmpeg.addArgument("amix=inputs=" + sourceList.size());
+        }
+
+        if (audioAttributes != null && audioAttributes.getAb() != null) {
+            ffmpeg.addArgument("-ab");
+            ffmpeg.addArgument(audioAttributes.getAb());
         }
 
         if (formatAttribute != null) {

@@ -6,7 +6,7 @@
 
     <groupId>com.github.vip-zpf</groupId>
     <artifactId>jave</artifactId>
-    <version>1.0.8</version>
+    <version>1.0.9</version>
 
     <parent>
         <groupId>org.sonatype.oss</groupId>

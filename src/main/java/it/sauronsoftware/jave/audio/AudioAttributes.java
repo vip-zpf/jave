@@ -83,4 +83,12 @@ public class AudioAttributes {
 	 */
 	private String af;
 
+	/**
+	 *
+	 * 音频比特率
+	 * 音频数据流量，一般选择32k、64k、96k、128k
+	 *
+	 */
+	private String ab;
+
 }

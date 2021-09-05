@@ -772,6 +772,18 @@ public class Encoder {
                 ffmpeg.addArgument("-r");
                 ffmpeg.addArgument(String.valueOf(frameRate.intValue()));
             }
+
+            //ffmpeg -i input.mkv -an -filter:v "setpts=0.5*PTS" output.mkv
+            if (audioAttributes == null || audioAttributes.getAf_Atempo() == null) {
+                String setpts = videoAttributes.getSetpts();
+                if (setpts != null && setpts != "") {
+                    ffmpeg.addArgument("-filter:v");
+                    String arg = "setpts=%s*PTS";
+                    arg = String.format(arg, setpts);
+                    ffmpeg.addArgument(arg);
+                }
+            }
+
             VideoSize size = videoAttributes.getSize();
             if (size != null) {
                 ffmpeg.addArgument("-s");
@@ -784,10 +796,41 @@ public class Encoder {
                 ffmpeg.addArgument("-ss");
                 ffmpeg.addArgument(startTime);
             }
+
             String duration = videoAttributes.getDuration();
             if (duration != null) {
                 ffmpeg.addArgument("-t");
                 ffmpeg.addArgument(duration);
+            }
+
+            if (videoAttributes.getQv() != null &&
+                    videoAttributes.getQv().length() > 0) {
+                ffmpeg.addArgument("-q:v");
+                ffmpeg.addArgument(videoAttributes.getQv());
+            }
+
+            if (videoAttributes.getVf() != null &&
+                    videoAttributes.getVf().length() > 0) {
+                ffmpeg.addArgument("-vf");
+                ffmpeg.addArgument(videoAttributes.getVf());
+            }
+
+            if (videoAttributes.getBv() != null &&
+                    videoAttributes.getBv().length() > 0) {
+                ffmpeg.addArgument("-b:v");
+                ffmpeg.addArgument(videoAttributes.getBv());
+            }
+
+            if (videoAttributes.getBufsize() != null &&
+                    videoAttributes.getBufsize().length() > 0) {
+                ffmpeg.addArgument("-bufsize");
+                ffmpeg.addArgument(videoAttributes.getBufsize());
+            }
+
+            if (videoAttributes.getMaxrate() != null &&
+                    videoAttributes.getMaxrate().length() > 0) {
+                ffmpeg.addArgument("-maxrate");
+                ffmpeg.addArgument(videoAttributes.getMaxrate());
             }
         }
         if (audioAttributes == null) {
@@ -813,10 +856,11 @@ public class Encoder {
                 ffmpeg.addArgument("-ar");
                 ffmpeg.addArgument(String.valueOf(samplingRate.intValue()));
             }
-            Integer volume = audioAttributes.getVolume();
-            if (volume != null) {
+
+            Integer vol = audioAttributes.getVol();
+            if (vol != null) {
                 ffmpeg.addArgument("-vol");
-                ffmpeg.addArgument(String.valueOf(volume.intValue()));
+                ffmpeg.addArgument(String.valueOf(vol.intValue()));
             }
             String startTime = audioAttributes.getStartTime();
             if (startTime != null) {
@@ -829,49 +873,54 @@ public class Encoder {
                 ffmpeg.addArgument(duration);
             }
 
+            if (audioAttributes.getAf() != null && audioAttributes.getAf() != "") {
+                ffmpeg.addArgument("-af");
+                ffmpeg.addArgument(audioAttributes.getAf());
+            }
+
+            if (videoAttributes == null || videoAttributes.getSetpts() == null || videoAttributes.getSetpts() == "") {
+                if (audioAttributes.getAf_Atempo() != null && audioAttributes.getAf_Atempo() != "") {
+                    String af_atempo = audioAttributes.getAf_Atempo();
+                    String videoArg = String.format("atempo=%s",af_atempo);
+
+                    ffmpeg.addArgument("-af");
+                    ffmpeg.addArgument(videoArg);
+                }
+            }
+
+            if (audioAttributes.getAf_volume() != null && audioAttributes.getAf_volume() != "") {
+                String af_volume = audioAttributes.getAf_volume();
+                String audioArg = String.format("volume=%s",af_volume);
+
+                ffmpeg.addArgument("-af");
+                ffmpeg.addArgument(audioArg);
+            }
         }
 
-        if (videoAttributes != null &&
-                videoAttributes.getQv() != null &&
-                videoAttributes.getQv().length() > 0) {
-            ffmpeg.addArgument("-q:v");
-            ffmpeg.addArgument(videoAttributes.getQv());
+        if (videoAttributes != null && audioAttributes != null) {
+            //音视频同时调整倍速
+            if (videoAttributes.getSetpts() != null && videoAttributes.getSetpts() != "" &&
+                    audioAttributes.getAf_Atempo() != null && audioAttributes.getAf_Atempo() != "") {
+                //ffmpeg -i input.mkv -filter_complex "[0:v]setpts=0.5*PTS[v];[0:a]atempo=2.0[a]" -map "[v]" -map "[a]" output.mkv
+                String setptsValue = videoAttributes.getSetpts();
+                String videoArg = "[0:v]setpts=%s*PTS[v];";
+                videoArg = String.format(videoArg, setptsValue);
+
+                String afValue = audioAttributes.getAf_Atempo();
+                String audioArg = "[0:a]atempo=%s[a]";
+                audioArg = String.format(audioArg, afValue);
+
+                ffmpeg.addArgument("-filter_complex");
+                ffmpeg.addArgument(videoArg + audioArg);
+
+                ffmpeg.addArgument("-map");
+                ffmpeg.addArgument("[v]");
+
+                ffmpeg.addArgument("-map");
+                ffmpeg.addArgument("[a]");
+            }
         }
 
-        if (videoAttributes != null &&
-                videoAttributes.getVf() != null &&
-                videoAttributes.getVf().length() > 0) {
-            ffmpeg.addArgument("-vf");
-            ffmpeg.addArgument(videoAttributes.getVf());
-        }
-
-        if (videoAttributes != null &&
-                videoAttributes.getBv() != null &&
-                videoAttributes.getBv().length() > 0) {
-            ffmpeg.addArgument("-b:v");
-            ffmpeg.addArgument(videoAttributes.getBv());
-        }
-
-        if (videoAttributes != null &&
-                videoAttributes.getBufsize() != null &&
-                videoAttributes.getBufsize().length() > 0) {
-            ffmpeg.addArgument("-bufsize");
-            ffmpeg.addArgument(videoAttributes.getBufsize());
-        }
-
-        if (videoAttributes != null &&
-                videoAttributes.getMaxrate() != null &&
-                videoAttributes.getMaxrate().length() > 0) {
-            ffmpeg.addArgument("-maxrate");
-            ffmpeg.addArgument(videoAttributes.getMaxrate());
-        }
-
-        if (audioAttributes != null &&
-                audioAttributes.getAf() != null &&
-                audioAttributes.getAf().length() > 0) {
-            ffmpeg.addArgument("-af");
-            ffmpeg.addArgument(audioAttributes.getAf());
-        }
 
         if (formatAttribute != null && formatAttribute.length() > 0) {
             ffmpeg.addArgument("-f");
@@ -1205,10 +1254,11 @@ public class Encoder {
                 ffmpeg.addArgument("-ar");
                 ffmpeg.addArgument(String.valueOf(samplingRate.intValue()));
             }
-            Integer volume = audioAttributes.getVolume();
-            if (volume != null) {
+
+            Integer vol = audioAttributes.getVol();
+            if (vol != null) {
                 ffmpeg.addArgument("-vol");
-                ffmpeg.addArgument(String.valueOf(volume.intValue()));
+                ffmpeg.addArgument(String.valueOf(vol.intValue()));
             }
             String startTime = audioAttributes.getStartTime();
             if (startTime != null) {
@@ -1385,10 +1435,11 @@ public class Encoder {
                 ffmpeg.addArgument("-ar");
                 ffmpeg.addArgument(String.valueOf(samplingRate.intValue()));
             }
-            Integer volume = audioAttributes.getVolume();
-            if (volume != null) {
+
+            Integer vol = audioAttributes.getVol();
+            if (vol != null) {
                 ffmpeg.addArgument("-vol");
-                ffmpeg.addArgument(String.valueOf(volume.intValue()));
+                ffmpeg.addArgument(String.valueOf(vol.intValue()));
             }
             String startTime = audioAttributes.getStartTime();
             if (startTime != null) {
@@ -1541,10 +1592,11 @@ public class Encoder {
                 ffmpeg.addArgument("-ar");
                 ffmpeg.addArgument(String.valueOf(samplingRate.intValue()));
             }
-            Integer volume = audioAttributes.getVolume();
-            if (volume != null) {
+
+            Integer vol = audioAttributes.getVol();
+            if (vol != null) {
                 ffmpeg.addArgument("-vol");
-                ffmpeg.addArgument(String.valueOf(volume.intValue()));
+                ffmpeg.addArgument(String.valueOf(vol.intValue()));
             }
             String startTime = audioAttributes.getStartTime();
             if (startTime != null) {

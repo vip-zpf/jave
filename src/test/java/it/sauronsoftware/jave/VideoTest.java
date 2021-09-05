@@ -148,4 +148,32 @@ public class VideoTest {
         VideoUtils.getVoideoAudio(source, target, attrs);
     }
 
+    @Test
+    public void videoSetpts() {
+        //加速播放
+        File source = new File("target/test-classes/material/girl.mp4");
+        File target = new File("target/test-classes/material/girl-pts.mp4");
+        EncodingAttributes attrs = new EncodingAttributes();
+        VideoAttributes videoAttributes = new VideoAttributes();
+        videoAttributes.setSetpts("0.25");
+        attrs.setVideoAttributes(videoAttributes);
+        VideoUtils.getVoideoAudio(source, target, attrs);
+    }
+
+    @Test
+    public void audioAtempoAndVideoPts() {
+        //音视频同时增加播放速度
+        File source = new File("target/test-classes/material/girl.mp4");
+        File target = new File("target/test-classes/material/12345.mp4");
+        EncodingAttributes attrs = new EncodingAttributes();
+        VideoAttributes videoAttributes = new VideoAttributes();
+        videoAttributes.setSetpts("0.5");
+
+        AudioAttributes audioAttributes = new AudioAttributes();
+        audioAttributes.setAf_Atempo("2");
+        attrs.setVideoAttributes(videoAttributes);
+        attrs.setAudioAttributes(audioAttributes);
+        VideoUtils.getVoideoAudio(source, target, attrs);
+    }
+
 }

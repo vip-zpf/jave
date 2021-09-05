@@ -12,7 +12,7 @@
 <dependency>
     <groupId>com.github.vip-zpf</groupId>
     <artifactId>jave</artifactId>
-    <version>1.0.7</version>
+    <version>1.1.0</version>
 </dependency>
 ```
 
@@ -51,162 +51,249 @@ ffmpeg 是依赖运行环境的，JAVE 项目封装了ffmpeg，它通过上述�
 * 获取音视频信息
 
 ```
-  File mp3Target = new File("target/test-classes/material/testAudio14.wav");
-  Encoder encoder = new Encoder();
-  try {
-      MultimediaInfo info = encoder.getInfo(mp3Target);
-      AudioInfo audio = info.getAudio();
-      int samplingRate = audio.getSamplingRate();
-      System.out.println(samplingRate);
-  } catch (EncoderException e) {
-      e.printStackTrace();
-  }
+    File mp3Target = new File("target/test-classes/material/testAudio14.wav");
+    Encoder encoder = new Encoder();
+    try {
+        MultimediaInfo info = encoder.getInfo(mp3Target);
+        AudioInfo audio = info.getAudio();
+        int samplingRate = audio.getSamplingRate();
+        System.out.println(samplingRate);
+    } catch (EncoderException e) {
+        e.printStackTrace();
+    }
 ```
 
 * 剪切音频
 
 ```
-  File source = new File("target/test-classes/material/longAudio.mp3");
-  File mp3Target = new File("target/test-classes/material/testAudio14.mp3");
-  AudioUtils.cutAndConvert(source, mp3Target, "mp3", "00:00:08", "00:00:10");
+    File source = new File("target/test-classes/material/longAudio.mp3");
+    File mp3Target = new File("target/test-classes/material/testAudio14.mp3");
+    AudioUtils.cutAndConvert(source, mp3Target, "mp3", "00:00:08", "00:00:10");
 ```
 
 * 音频转换格式
 
 ```
-  File source = new File("target/test-classes/material/longAudio.mp3");
-  File wavTarget = new File("testAudio.wav");
-  AudioUtils.amrToWav(source, wavTarget);
+    File source = new File("target/test-classes/material/longAudio.mp3");
+    File wavTarget = new File("testAudio.wav");
+    AudioUtils.amrToWav(source, wavTarget);
 ```
 
 * 多段音频合并
 
 ```
-  File source1 = new File("target/test-classes/material/sunwukong.mp3");
-  File source2 = new File("target/test-classes/material/luban.mp3");
-  File source3 = new File("target/test-classes/material/lvbu.wav");
-  File source4 = new File("target/test-classes/material/diaochan.mp3");
-  File source5 = new File("target/test-classes/material/direnjie.mp3");
-  File targetSource = new File("target/test-classes/material/wangzherongyao.wav");
-  AudioUtils.mergeAudio(Arrays.asList(source1, source2,source3,source4,source5), targetSource, null);
+    File source1 = new File("target/test-classes/material/sunwukong.mp3");
+    File source2 = new File("target/test-classes/material/luban.mp3");
+    File source3 = new File("target/test-classes/material/lvbu.wav");
+    File source4 = new File("target/test-classes/material/diaochan.mp3");
+    File source5 = new File("target/test-classes/material/direnjie.mp3");
+    File targetSource = new File("target/test-classes/material/wangzherongyao.wav");
+    AudioUtils.mergeAudio(Arrays.asList(source1, source2,source3,source4,source5), targetSource, null);
+```
+
+* 音频倍速播放
+
+```
+    File source = new File("target/test-classes/material/longAudio.mp3");
+    File target = new File("target/test-classes/material/longAudio-atempo.mp3");
+    AudioUtils.audioAtempo(source, target, 2.0);
+```
+
+* 音频音量调整一（不用滤镜方式）
+
+```
+    File source = new File("target/test-classes/material/longAudio.mp3");
+    File target = new File("target/test-classes/material/longAudio-vol.mp3");
+    
+    AudioAttributes audioAttributes = new AudioAttributes();
+    audioAttributes.setVol(1000);
+    
+    EncodingAttributes encodingAttributes = new EncodingAttributes();
+    encodingAttributes.setAudioAttributes(audioAttributes);
+    
+    AudioUtils.operate(source, target, encodingAttributes);
+```
+
+* 音频音量调整二（滤镜方式-有损增加音量）
+
+```
+    File source = new File("target/test-classes/material/longAudio.mp3");
+    File target = new File("target/test-classes/material/longAudio-volume.mp3");
+    
+    AudioAttributes audioAttributes = new AudioAttributes();
+    audioAttributes.setAf_volume("2");
+    
+    EncodingAttributes encodingAttributes = new EncodingAttributes();
+    encodingAttributes.setAudioAttributes(audioAttributes);
+    
+    AudioUtils.operate(source, target, encodingAttributes);
+```
+
+* 音频音量调整三（滤镜方式-无损增加音量）
+
+```
+    File source = new File("target/test-classes/material/longAudio.mp3");
+    File target = new File("target/test-classes/material/longAudio-volume-db.mp3");
+
+    AudioAttributes audioAttributes = new AudioAttributes();
+    audioAttributes.setAf_volume("5dB");
+
+    EncodingAttributes encodingAttributes = new EncodingAttributes();
+    encodingAttributes.setAudioAttributes(audioAttributes);
+
+    AudioUtils.operate(source, target, encodingAttributes);
 ```
 
 * 视频转图片
 
 ```
-  File source = new File("target/test-classes/material/testVideo.avi");
-  File target = new File("target/test-classes/material/image/image-%3d.jpeg");
-  VideoUtils.thumbnail(source, target, null);
+    File source = new File("target/test-classes/material/testVideo.avi");
+    File target = new File("target/test-classes/material/image/image-%3d.jpeg");
+    VideoUtils.thumbnail(source, target, null);
 ```
 
 * 抽取视频中的音频
 
 ```
-  File source = new File("target/test-classes/material/testVideo.avi");
-  File target = new File("target/test-classes/material/target.wav");
-  VideoUtils.getVoideoAudio(source, target, null);
+    File source = new File("target/test-classes/material/testVideo.avi");
+    File target = new File("target/test-classes/material/target.wav");
+    VideoUtils.getVoideoAudio(source, target, null);
 ```
 
 * 无损-合并多段视频
 
 ```
-  //1、如果第一个视频没有声音，那么合并后的视频也是没有声音的
-  //2、必须保证所有视频的格式，分辨率都一样，不然结果不可控
-  File source1 = new File("target/test-classes/material/girl.mp4");
-  File source2 = new File("target/test-classes/material/man.mp4");
-  File source3 = new File("target/test-classes/material/face.mp4");
-  File target = new File("target/test-classes/material/aaa.mp4");
+    //1、如果第一个视频没有声音，那么合并后的视频也是没有声音的
+    //2、必须保证所有视频的格式，分辨率都一样，不然结果不可控
+    File source1 = new File("target/test-classes/material/girl.mp4");
+    File source2 = new File("target/test-classes/material/man.mp4");
+    File source3 = new File("target/test-classes/material/face.mp4");
+    File target = new File("target/test-classes/material/aaa.mp4");
 
-  String data = new StringBuffer().
+    String data = new StringBuffer().
           append("file '").append(source1.getAbsolutePath()).append("'").append(System.getProperty("line.separator")).
           append("file '").append(source2.getAbsolutePath()).append("'").append(System.getProperty("line.separator")).
           append("file '").append(source3.getAbsolutePath()).append("'").append(System.getProperty("line.separator")).
           toString();
-  File mergeVideoTxt = new File("target/test-classes/material/", "mergeVideo.txt");
-  FileUtils.writeStringToFile(mergeVideoTxt, data, "UTF-8", false);
-  VideoUtils.mergeVideoByLossless(mergeVideoTxt, target, "mp4");
+    File mergeVideoTxt = new File("target/test-classes/material/", "mergeVideo.txt");
+    FileUtils.writeStringToFile(mergeVideoTxt, data, "UTF-8", false);
+    VideoUtils.mergeVideoByLossless(mergeVideoTxt, target, "mp4");
 ```
 
 * 有损-合并多段视频 （注意：合并后的文件格式是mkv）
 
 ```
-  File source1 = new File("target/test-classes/material/girl.mp4");
-  File source2 = new File("target/test-classes/material/man.mp4");
-  File source3 = new File("target/test-classes/material/girl.mp4");
-  File target = new File("target/test-classes/material/bbb.mkv");
+    File source1 = new File("target/test-classes/material/girl.mp4");
+    File source2 = new File("target/test-classes/material/man.mp4");
+    File source3 = new File("target/test-classes/material/girl.mp4");
+    File target = new File("target/test-classes/material/bbb.mkv");
 
-  LinkedList<File> files = new LinkedList<>();
-  files.add(source1);
-  files.add(source2);
-  files.add(source3);
-  VideoUtils.mergeVideoByDamaging(files, target, "mp4");
+    LinkedList<File> files = new LinkedList<>();
+    files.add(source1);
+    files.add(source2);
+    files.add(source3);
+    VideoUtils.mergeVideoByDamaging(files, target, "mp4");
 ```
 
 * 视频中插入音频（视频原本无音频）
 
 ```
-  File source1 = new File("target/test-classes/material/face.mp4");
-  File source2 = new File("target/test-classes/material/wangzherongyao.wav");
-  File target = new File("target/test-classes/material/videoAndAudio.mp4");
+    File source1 = new File("target/test-classes/material/face.mp4");
+    File source2 = new File("target/test-classes/material/wangzherongyao.wav");
+    File target = new File("target/test-classes/material/videoAndAudio.mp4");
 
-  LinkedList<File> files = new LinkedList<>();
-  files.add(source1);
-  files.add(source2);
-  VideoUtils.mergeVoideoAndAudioByInsert(files, target, null);
+    LinkedList<File> files = new LinkedList<>();
+    files.add(source1);
+    files.add(source2);
+    VideoUtils.mergeVoideoAndAudioByInsert(files, target, null);
 ```
 
 * 替换视频中的音频
 
 ```
-  File source1 = new File("target/test-classes/material/girl.mp4");
-  File source2 = new File("target/test-classes/material/wangzherongyao.wav");
-  File target = new File("target/test-classes/material/videoAndAudio2.mp4");
+    File source1 = new File("target/test-classes/material/girl.mp4");
+    File source2 = new File("target/test-classes/material/wangzherongyao.wav");
+    File target = new File("target/test-classes/material/videoAndAudio2.mp4");
 
-  LinkedList<File> files = new LinkedList<>();
-  files.add(source1);
-  files.add(source2);
-  VideoUtils.mergeVoideoAndAudioByReplace(files, target, "mp4");
+    LinkedList<File> files = new LinkedList<>();
+    files.add(source1);
+    files.add(source2);
+    VideoUtils.mergeVoideoAndAudioByReplace(files, target, "mp4");
 ```
 
 * 旋转视频 一
 
 ```
-//ps: "transpose=1" 顺时针旋转画面90度
-//ps: "transpose=2" 逆时针旋转画面90度
-//ps: "transpose=3" 顺时针旋转画面90度再水平翻转
-//ps: "transpose=0" 逆时针旋转画面90度再水平翻转
-//ps: hflip 水平翻转视频画面
-//ps: vflip 垂直翻转视频画面
-File source = new File("target/test-classes/material/girl.mp4");
-File target = new File("target/test-classes/material/girlRoate.mp4");
-VideoUtils.roateVideo(source, target, "transpose=1");
+    //ps: "transpose=1" 顺时针旋转画面90度
+    //ps: "transpose=2" 逆时针旋转画面90度
+    //ps: "transpose=3" 顺时针旋转画面90度再水平翻转
+    //ps: "transpose=0" 逆时针旋转画面90度再水平翻转
+    //ps: hflip 水平翻转视频画面
+    //ps: vflip 垂直翻转视频画面
+    File source = new File("target/test-classes/material/girl.mp4");
+    File target = new File("target/test-classes/material/girlRoate.mp4");
+    VideoUtils.roateVideo(source, target, "transpose=1");
   
 ```
 
 * 旋转视频 二
 
 ```
-File source = new File("target/test-classes/material/girl.mp4");
-File target = new File("target/test-classes/material/girlRoate.mp4");
-VideoUtils.roateVideoByMetadata(source, target, "rotate=90");
+    File source = new File("target/test-classes/material/girl.mp4");
+    File target = new File("target/test-classes/material/girlRoate.mp4");
+    VideoUtils.roateVideoByMetadata(source, target, "rotate=90");
 ```
 
 * webm转mp4 一
 
 ```
-File source = new File("target/test-classes/material/abc.webm");
-File target = new File("target/test-classes/material/webm2MP4.mp4");
-VideoUtils.webm2mp4(source, target, "2000k","2000k","2500k");
+    File source = new File("target/test-classes/material/abc.webm");
+    File target = new File("target/test-classes/material/webm2MP4.mp4");
+    VideoUtils.webm2mp4(source, target, "2000k","2000k","2500k");
 ```
 
 * webm转mp4 二
 
 ```
-File source = new File("target/test-classes/material/abc.webm");
-File target = new File("target/test-classes/material/webm2MP4.mp4");
-VideoUtils.webm2mp4(source, target, null, null);
+    File source = new File("target/test-classes/material/abc.webm");
+    File target = new File("target/test-classes/material/webm2MP4.mp4");
+    VideoUtils.webm2mp4(source, target, null, null);
 ```
 
+* 视频加速播放（不包含音频）
+
+```
+    File source = new File("target/test-classes/material/girl.mp4");
+    File target = new File("target/test-classes/material/girl-pts.mp4");
+    
+    VideoAttributes videoAttributes = new VideoAttributes();
+    videoAttributes.setSetpts("0.25");
+    
+    EncodingAttributes attrs = new EncodingAttributes();
+    attrs.setVideoAttributes(videoAttributes);
+    
+    VideoUtils.getVoideoAudio(source, target, attrs);
+```
+
+* 音视频同时加速播放
+
+```
+    File source = new File("target/test-classes/material/girl.mp4");
+    File target = new File("target/test-classes/material/12345.mp4");
+    EncodingAttributes attrs = new EncodingAttributes();
+    VideoAttributes videoAttributes = new VideoAttributes();
+    videoAttributes.setSetpts("0.5");
+
+    AudioAttributes audioAttributes = new AudioAttributes();
+    audioAttributes.setAf_Atempo("2");
+    attrs.setVideoAttributes(videoAttributes);
+    attrs.setAudioAttributes(audioAttributes);
+    VideoUtils.getVoideoAudio(source, target, attrs);
+```
+
+# 如果对您有用，感谢支持
+
+<img src="https://github.com/vip-zpf/jave/pay.jpg" width="50%" height="50%" />
 
 # 参考
 

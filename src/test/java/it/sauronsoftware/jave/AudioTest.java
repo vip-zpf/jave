@@ -1,5 +1,6 @@
 package it.sauronsoftware.jave;
 
+import it.sauronsoftware.jave.audio.AudioAttributes;
 import it.sauronsoftware.jave.audio.AudioInfo;
 import it.sauronsoftware.jave.audio.AudioUtils;
 import org.junit.Test;
@@ -63,9 +64,58 @@ public class AudioTest {
 
     @Test
     public void audioAtempo() {
+        //倍速
         File source = new File("target/test-classes/material/longAudio.mp3");
         File target = new File("target/test-classes/material/longAudio-atempo.mp3");
-        AudioUtils.audioAtempo(source, target, 0.8);
+        AudioUtils.audioAtempo(source, target, 2.0);
     }
+
+
+    @Test
+    public void audioVol() {
+        //增加音量
+        File source = new File("target/test-classes/material/longAudio.mp3");
+        File target = new File("target/test-classes/material/longAudio-vol.mp3");
+
+        AudioAttributes audioAttributes = new AudioAttributes();
+        audioAttributes.setVol(1000);
+
+        EncodingAttributes encodingAttributes = new EncodingAttributes();
+        encodingAttributes.setAudioAttributes(audioAttributes);
+
+        AudioUtils.operate(source, target, encodingAttributes);
+    }
+
+    @Test
+    public void audioAfVolume() {
+        //有损 - 增加音量
+        File source = new File("target/test-classes/material/longAudio.mp3");
+        File target = new File("target/test-classes/material/longAudio-volume.mp3");
+
+        AudioAttributes audioAttributes = new AudioAttributes();
+        audioAttributes.setAf_volume("2");
+
+        EncodingAttributes encodingAttributes = new EncodingAttributes();
+        encodingAttributes.setAudioAttributes(audioAttributes);
+
+        AudioUtils.operate(source, target, encodingAttributes);
+    }
+
+    @Test
+    public void audioAfVolume2() {
+        //无损 - 增加音量
+        File source = new File("target/test-classes/material/longAudio.mp3");
+        File target = new File("target/test-classes/material/longAudio-volume-db.mp3");
+
+        AudioAttributes audioAttributes = new AudioAttributes();
+        audioAttributes.setAf_volume("5dB");
+
+        EncodingAttributes encodingAttributes = new EncodingAttributes();
+        encodingAttributes.setAudioAttributes(audioAttributes);
+
+        AudioUtils.operate(source, target, encodingAttributes);
+    }
+
+
 }
 

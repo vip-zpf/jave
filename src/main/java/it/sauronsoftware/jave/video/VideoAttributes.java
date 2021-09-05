@@ -115,6 +115,20 @@ public class VideoAttributes implements Serializable {
      */
     private VideoMergeTypeEnum mergeType;
 
+    /**
+     * 修改视频速率
+     * 调整视频速率的原理为：修改视频的pts，dts
+     * 此过程由于不用进行解码编码，所以费时很少
+     * 注意：
+     * 调整速度倍率范围[0.25, 4]
+     * 如果只调整视频的话最好把音频禁掉
+     * 对视频进行加速时，如果不想丢帧，可以用frameRate（-r） 参数指定输出视频FPS
+     * ps：如果此参数传入0.5，对应的命令就是setpts=0.5*PTS
+     * 0.5代表将播放时间缩短一半
+     * 数字越小播放越快，数字越大播放越慢
+     */
+    private String setpts;
+
 
 
 }

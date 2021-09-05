@@ -152,14 +152,14 @@ public class AudioUtils {
 
     /**
      * 音频倍速播放
+     *
      * @param source
      * @param target
      * @param atempo
      */
     public static void audioAtempo(File source, File target, Double atempo) {
         AudioAttributes audioAttributes = new AudioAttributes();
-        String af = "atempo=" + atempo;
-        audioAttributes.setAf(af);
+        audioAttributes.setAf_Atempo(String.valueOf(atempo));
 
         EncodingAttributes attrs = new EncodingAttributes();
         attrs.setAudioAttributes(audioAttributes);

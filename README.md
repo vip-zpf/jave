@@ -295,6 +295,8 @@ ffmpeg 是依赖运行环境的，JAVE 项目封装了ffmpeg，它通过上述�
 
 <img src="https://github.com/vip-zpf/jave/pay.jpg" width="50%" height="50%" />
 
+![avatar](data:image/png;base64,iVBORw0......)
+
 # 参考
 
 借鉴 [JAVE](http://www.sauronsoftware.it/projects/jave/download.php) 的代码

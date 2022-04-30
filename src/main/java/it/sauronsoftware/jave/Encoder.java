@@ -44,65 +44,55 @@ public class Encoder {
      * This regexp is used to parse the ffmpeg output about the supported
      * formats.
      */
-    private static final Pattern FORMAT_PATTERN = Pattern
-            .compile("^\\s*([D ])([E ])\\s+([\\w,]+)\\s+.+$");
+    private static final Pattern FORMAT_PATTERN = Pattern.compile("^\\s*([D ])([E ])\\s+([\\w,]+)\\s+.+$");
 
     /**
      * This regexp is used to parse the ffmpeg output about the included
      * encoders/decoders.
      */
-    private static final Pattern ENCODER_DECODER_PATTERN = Pattern.compile(
-            "^\\s*([D ])([E ])([AVS]).{3}\\s+(.+)$", Pattern.CASE_INSENSITIVE);
+    private static final Pattern ENCODER_DECODER_PATTERN = Pattern.compile("^\\s*([D ])([E ])([AVS]).{3}\\s+(.+)$", Pattern.CASE_INSENSITIVE);
 
     /**
      * This regexp is used to parse the ffmpeg output about the ongoing encoding
      * process.
      */
-    private static final Pattern PROGRESS_INFO_PATTERN = Pattern.compile(
-            "\\s*(\\w+)\\s*=\\s*(\\S+)\\s*", Pattern.CASE_INSENSITIVE);
+    private static final Pattern PROGRESS_INFO_PATTERN = Pattern.compile("\\s*(\\w+)\\s*=\\s*(\\S+)\\s*", Pattern.CASE_INSENSITIVE);
 
     /**
      * This regexp is used to parse the ffmpeg output about the size of a video
      * stream.
      */
-    private static final Pattern SIZE_PATTERN = Pattern.compile(
-            "(\\d+)x(\\d+)", Pattern.CASE_INSENSITIVE);
+    private static final Pattern SIZE_PATTERN = Pattern.compile("(\\d+)x(\\d+)", Pattern.CASE_INSENSITIVE);
 
     /**
      * This regexp is used to parse the ffmpeg output about the frame rate value
      * of a video stream.
      */
-    private static final Pattern FRAME_RATE_PATTERN = Pattern.compile(
-            "([\\d.]+)\\s+(?:fps|tb\\(r\\))", Pattern.CASE_INSENSITIVE);
+    private static final Pattern FRAME_RATE_PATTERN = Pattern.compile("([\\d.]+)\\s+(?:fps|tb\\(r\\))", Pattern.CASE_INSENSITIVE);
 
     /**
      * This regexp is used to parse the ffmpeg output about the bit rate value
      * of a stream.
      */
-    private static final Pattern BIT_RATE_PATTERN = Pattern.compile(
-            "(\\d+)\\s+kb/s", Pattern.CASE_INSENSITIVE);
+    private static final Pattern BIT_RATE_PATTERN = Pattern.compile("(\\d+)\\s+kb/s", Pattern.CASE_INSENSITIVE);
 
     /**
      * This regexp is used to parse the ffmpeg output about the sampling rate of
      * an audio stream.
      */
-    private static final Pattern SAMPLING_RATE_PATTERN = Pattern.compile(
-            "(\\d+)\\s+Hz", Pattern.CASE_INSENSITIVE);
+    private static final Pattern SAMPLING_RATE_PATTERN = Pattern.compile("(\\d+)\\s+Hz", Pattern.CASE_INSENSITIVE);
 
     /**
      * This regexp is used to parse the ffmpeg output about the channels number
      * of an audio stream.
      */
-    private static final Pattern CHANNELS_PATTERN = Pattern.compile(
-            "(mono|stereo)", Pattern.CASE_INSENSITIVE);
+    private static final Pattern CHANNELS_PATTERN = Pattern.compile("(mono|stereo)", Pattern.CASE_INSENSITIVE);
 
     /**
      * This regexp is used to parse the ffmpeg output about the success of an
      * encoding operation.
      */
-    private static final Pattern SUCCESS_PATTERN = Pattern.compile(
-            "^\\s*video\\:\\S+\\s+audio\\:\\S+\\s+global headers\\:\\S+.*$",
-            Pattern.CASE_INSENSITIVE);
+    private static final Pattern SUCCESS_PATTERN = Pattern.compile("^\\s*video\\:\\S+\\s+audio\\:\\S+\\s+global headers\\:\\S+.*$", Pattern.CASE_INSENSITIVE);
 
     /**
      * The locator of the ffmpeg executable used by this encoder.
@@ -142,8 +132,7 @@ public class Encoder {
         try {
             ffmpeg.execute();
             RBufferedReader reader = null;
-            reader = new RBufferedReader(new InputStreamReader(ffmpeg
-                    .getInputStream()));
+            reader = new RBufferedReader(new InputStreamReader(ffmpeg.getInputStream()));
             String line;
             boolean evaluate = false;
             while ((line = reader.readLine()) != null) {
@@ -155,8 +144,7 @@ public class Encoder {
                     if (matcher.matches()) {
                         String decoderFlag = matcher.group(1);
                         String audioVideoFlag = matcher.group(3);
-                        if ("D".equals(decoderFlag)
-                                && "A".equals(audioVideoFlag)) {
+                        if ("D".equals(decoderFlag) && "A".equals(audioVideoFlag)) {
                             String name = matcher.group(4);
                             res.add(name);
                         }
@@ -195,8 +183,7 @@ public class Encoder {
         try {
             ffmpeg.execute();
             RBufferedReader reader = null;
-            reader = new RBufferedReader(new InputStreamReader(ffmpeg
-                    .getInputStream()));
+            reader = new RBufferedReader(new InputStreamReader(ffmpeg.getInputStream()));
             String line;
             boolean evaluate = false;
             while ((line = reader.readLine()) != null) {
@@ -208,8 +195,7 @@ public class Encoder {
                     if (matcher.matches()) {
                         String encoderFlag = matcher.group(2);
                         String audioVideoFlag = matcher.group(3);
-                        if ("E".equals(encoderFlag)
-                                && "A".equals(audioVideoFlag)) {
+                        if ("E".equals(encoderFlag) && "A".equals(audioVideoFlag)) {
                             String name = matcher.group(4);
                             res.add(name);
                         }
@@ -248,8 +234,7 @@ public class Encoder {
         try {
             ffmpeg.execute();
             RBufferedReader reader = null;
-            reader = new RBufferedReader(new InputStreamReader(ffmpeg
-                    .getInputStream()));
+            reader = new RBufferedReader(new InputStreamReader(ffmpeg.getInputStream()));
             String line;
             boolean evaluate = false;
             while ((line = reader.readLine()) != null) {
@@ -261,8 +246,7 @@ public class Encoder {
                     if (matcher.matches()) {
                         String decoderFlag = matcher.group(1);
                         String audioVideoFlag = matcher.group(3);
-                        if ("D".equals(decoderFlag)
-                                && "V".equals(audioVideoFlag)) {
+                        if ("D".equals(decoderFlag) && "V".equals(audioVideoFlag)) {
                             String name = matcher.group(4);
                             res.add(name);
                         }
@@ -301,8 +285,7 @@ public class Encoder {
         try {
             ffmpeg.execute();
             RBufferedReader reader = null;
-            reader = new RBufferedReader(new InputStreamReader(ffmpeg
-                    .getInputStream()));
+            reader = new RBufferedReader(new InputStreamReader(ffmpeg.getInputStream()));
             String line;
             boolean evaluate = false;
             while ((line = reader.readLine()) != null) {
@@ -314,8 +297,7 @@ public class Encoder {
                     if (matcher.matches()) {
                         String encoderFlag = matcher.group(2);
                         String audioVideoFlag = matcher.group(3);
-                        if ("E".equals(encoderFlag)
-                                && "V".equals(audioVideoFlag)) {
+                        if ("E".equals(encoderFlag) && "V".equals(audioVideoFlag)) {
                             String name = matcher.group(4);
                             res.add(name);
                         }
@@ -356,8 +338,7 @@ public class Encoder {
         try {
             ffmpeg.execute();
             RBufferedReader reader = null;
-            reader = new RBufferedReader(new InputStreamReader(ffmpeg
-                    .getInputStream()));
+            reader = new RBufferedReader(new InputStreamReader(ffmpeg.getInputStream()));
             String line;
             boolean evaluate = false;
             while ((line = reader.readLine()) != null) {
@@ -414,8 +395,7 @@ public class Encoder {
         try {
             ffmpeg.execute();
             RBufferedReader reader = null;
-            reader = new RBufferedReader(new InputStreamReader(ffmpeg
-                    .getInputStream()));
+            reader = new RBufferedReader(new InputStreamReader(ffmpeg.getInputStream()));
             String line;
             boolean evaluate = false;
             while ((line = reader.readLine()) != null) {
@@ -466,8 +446,7 @@ public class Encoder {
      *                              decoded.
      * @throws EncoderException     If a problem occurs calling the underlying ffmpeg executable.
      */
-    public MultimediaInfo getInfo(File source) throws InputFormatException,
-            EncoderException {
+    public MultimediaInfo getInfo(File source) throws InputFormatException, EncoderException {
         FFMPEGExecutor ffmpeg = locator.createExecutor();
         ffmpeg.addArgument("-i");
         ffmpeg.addArgument(source.getAbsolutePath());
@@ -478,8 +457,7 @@ public class Encoder {
         }
         try {
             RBufferedReader reader = null;
-            reader = new RBufferedReader(new InputStreamReader(ffmpeg
-                    .getErrorStream()));
+            reader = new RBufferedReader(new InputStreamReader(ffmpeg.getErrorStream()));
             return parseMultimediaInfo(source, reader);
         } finally {
             ffmpeg.destroy();
@@ -498,18 +476,17 @@ public class Encoder {
      *                              decoded.
      * @throws EncoderException     If a problem occurs calling the underlying ffmpeg executable.
      */
-    private MultimediaInfo parseMultimediaInfo(File source,
-                                               RBufferedReader reader) throws InputFormatException,
-            EncoderException {
-        Pattern p1 = Pattern.compile("^\\s*Input #0, (\\w+).+$\\s*",
-                Pattern.CASE_INSENSITIVE);
-        Pattern p2 = Pattern.compile(
-                "^\\s*Duration: (\\d\\d):(\\d\\d):(\\d\\d)\\.(\\d).*$",
-                Pattern.CASE_INSENSITIVE);
-        Pattern p3 = Pattern.compile(
-                "^\\s*Stream #\\S+: ((?:Audio)|(?:Video)|(?:Data)): (.*)\\s*$",
-                Pattern.CASE_INSENSITIVE);
+    private MultimediaInfo parseMultimediaInfo(File source, RBufferedReader reader) throws InputFormatException, EncoderException {
+        Pattern p1 = Pattern.compile("^\\s*Input #0, (\\w+).+$\\s*", Pattern.CASE_INSENSITIVE);
+        Pattern p2 = Pattern.compile("^\\s*Duration: (\\d\\d):(\\d\\d):(\\d\\d)\\.(\\d).*$", Pattern.CASE_INSENSITIVE);
+        Pattern p3 = Pattern.compile("^\\s*Stream #\\S+: ((?:Audio)|(?:Video)|(?:Data)): (.*)\\s*$", Pattern.CASE_INSENSITIVE);
         MultimediaInfo info = null;
+        boolean videoInfo = false;
+        boolean audioInfo = false;
+        int creationflag = 0;
+        LinkedList<String> creations = new LinkedList<String>();
+        VideoInfo video = new VideoInfo();
+        AudioInfo audio = new AudioInfo();
         try {
             int step = 0;
             while (true) {
@@ -524,32 +501,33 @@ public class Encoder {
                         throw new InputFormatException(message);
                     }
                     Matcher m = p1.matcher(line);
+                    boolean flag = false;
                     if (m.matches()) {
                         String format = m.group(1);
                         info = new MultimediaInfo();
                         info.setFormat(format);
                         step++;
+                        creations.add("metadata@");
                     }
-                } else if (step == 1) {
+                }
+                if (step == 1) {
                     Matcher m = p2.matcher(line);
                     if (m.matches()) {
                         long hours = Integer.parseInt(m.group(1));
                         long minutes = Integer.parseInt(m.group(2));
                         long seconds = Integer.parseInt(m.group(3));
                         long dec = Integer.parseInt(m.group(4));
-                        long duration = (dec * 100L) + (seconds * 1000L)
-                                + (minutes * 60L * 1000L)
-                                + (hours * 60L * 60L * 1000L);
+                        long duration = (dec * 100L) + (seconds * 1000L) + (minutes * 60L * 1000L) + (hours * 60L * 60L * 1000L);
                         info.setDuration(duration);
                         step++;
                     }
-                } else if (step == 2) {
+                }
+                if (step == 2) {
                     Matcher m = p3.matcher(line);
                     if (m.matches()) {
                         String type = m.group(1);
                         String specs = m.group(2);
                         if ("Video".equalsIgnoreCase(type)) {
-                            VideoInfo video = new VideoInfo();
                             StringTokenizer st = new StringTokenizer(specs, ",");
                             for (int i = 0; st.hasMoreTokens(); i++) {
                                 String token = st.nextToken().trim();
@@ -560,20 +538,16 @@ public class Encoder {
                                     // Video size.
                                     Matcher m2 = SIZE_PATTERN.matcher(token);
                                     if (!parsed && m2.find()) {
-                                        int width = Integer.parseInt(m2
-                                                .group(1));
-                                        int height = Integer.parseInt(m2
-                                                .group(2));
-                                        video.setSize(new VideoSize(width,
-                                                height));
+                                        int width = Integer.parseInt(m2.group(1));
+                                        int height = Integer.parseInt(m2.group(2));
+                                        video.setSize(new VideoSize(width, height));
                                         parsed = true;
                                     }
                                     // Frame rate.
                                     m2 = FRAME_RATE_PATTERN.matcher(token);
                                     if (!parsed && m2.find()) {
                                         try {
-                                            float frameRate = Float
-                                                    .parseFloat(m2.group(1));
+                                            float frameRate = Float.parseFloat(m2.group(1));
                                             video.setFrameRate(frameRate);
                                         } catch (NumberFormatException e) {
                                             ;
@@ -583,16 +557,17 @@ public class Encoder {
                                     // Bit rate.
                                     m2 = BIT_RATE_PATTERN.matcher(token);
                                     if (!parsed && m2.find()) {
-                                        int bitRate = Integer.parseInt(m2
-                                                .group(1));
+                                        int bitRate = Integer.parseInt(m2.group(1));
                                         video.setBitRate(bitRate);
                                         parsed = true;
                                     }
                                 }
                             }
                             info.setVideo(video);
-                        } else if ("Audio".equalsIgnoreCase(type)) {
-                            AudioInfo audio = new AudioInfo();
+                            videoInfo = true;
+                            creations.add("video@");
+                        }
+                        if ("Audio".equalsIgnoreCase(type)) {
                             StringTokenizer st = new StringTokenizer(specs, ",");
                             for (int i = 0; st.hasMoreTokens(); i++) {
                                 String token = st.nextToken().trim();
@@ -601,11 +576,9 @@ public class Encoder {
                                 } else {
                                     boolean parsed = false;
                                     // Sampling rate.
-                                    Matcher m2 = SAMPLING_RATE_PATTERN
-                                            .matcher(token);
+                                    Matcher m2 = SAMPLING_RATE_PATTERN.matcher(token);
                                     if (!parsed && m2.find()) {
-                                        int samplingRate = Integer.parseInt(m2
-                                                .group(1));
+                                        int samplingRate = Integer.parseInt(m2.group(1));
                                         audio.setSamplingRate(samplingRate);
                                         parsed = true;
                                     }
@@ -615,8 +588,7 @@ public class Encoder {
                                         String ms = m2.group(1);
                                         if ("mono".equalsIgnoreCase(ms)) {
                                             audio.setChannels(1);
-                                        } else if ("stereo"
-                                                .equalsIgnoreCase(ms)) {
+                                        } else if ("stereo".equalsIgnoreCase(ms)) {
                                             audio.setChannels(2);
                                         }
                                         parsed = true;
@@ -624,17 +596,43 @@ public class Encoder {
                                     // Bit rate.
                                     m2 = BIT_RATE_PATTERN.matcher(token);
                                     if (!parsed && m2.find()) {
-                                        int bitRate = Integer.parseInt(m2
-                                                .group(1));
+                                        int bitRate = Integer.parseInt(m2.group(1));
                                         audio.setBitRate(bitRate);
                                         parsed = true;
                                     }
                                 }
                             }
                             info.setAudio(audio);
+                            audioInfo = true;
+                            creations.add("audio@");
                         }
-                    } else {
+                    }
+                    if (audioInfo == true && videoInfo == true && creationflag == 3) {
                         step = 3;
+                        for (String creation : creations) {
+                            if (creation == null || creation == "") continue;
+                            String[] split = creation.split("@");
+                            if (creation.contains("metadata")) {
+                                info.setCreationTime(DateUtil.UTCGMT2Date(split[1]));
+                                continue;
+                            }
+                            if (creation.contains("video")) {
+                                video.setCreationTime(DateUtil.UTCGMT2Date(split[1]));
+                                info.setVideo(video);
+                                continue;
+                            }
+                            if (creation.contains("audio")) {
+                                audio.setCreationTime(DateUtil.UTCGMT2Date(split[1]));
+                                info.setAudio(audio);
+                            }
+                        }
+                    }
+                }
+                if (line.contains("creation_time")) {
+                    String[] split = line.split(" :");
+                    if (split.length == 2) {
+                        creationflag++;
+                        creations.set(creations.size() - 1, creations.getLast() + split[1].trim());
                     }
                 }
                 if (step == 3) {
@@ -690,9 +688,7 @@ public class Encoder {
      * @throws InputFormatException     If the source multimedia file cannot be decoded.
      * @throws EncoderException         If a problems occurs during the encoding process.
      */
-    public void encode(File source, File target, EncodingAttributes attributes)
-            throws IllegalArgumentException, InputFormatException,
-            EncoderException {
+    public void encode(File source, File target, EncodingAttributes attributes) throws IllegalArgumentException, InputFormatException, EncoderException {
         encode(source, target, attributes, null);
     }
 
@@ -713,17 +709,14 @@ public class Encoder {
      * @throws InputFormatException     If the source multimedia file cannot be decoded.
      * @throws EncoderException         If a problems occurs during the encoding process.
      */
-    public void encode(File source, File target, EncodingAttributes attributes,
-                       EncoderProgressListener listener) throws IllegalArgumentException,
-            InputFormatException, EncoderException {
+    public void encode(File source, File target, EncodingAttributes attributes, EncoderProgressListener listener) throws IllegalArgumentException, InputFormatException, EncoderException {
         String formatAttribute = attributes.getFormat();
         Float offsetAttribute = attributes.getOffset();
         Float durationAttribute = attributes.getDuration();
         AudioAttributes audioAttributes = attributes.getAudioAttributes();
         VideoAttributes videoAttributes = attributes.getVideoAttributes();
         if (audioAttributes == null && videoAttributes == null) {
-            throw new IllegalArgumentException(
-                    "Both audio and video attributes are null");
+            throw new IllegalArgumentException("Both audio and video attributes are null");
         }
         target = target.getAbsoluteFile();
         target.getParentFile().mkdirs();
@@ -787,8 +780,7 @@ public class Encoder {
             VideoSize size = videoAttributes.getSize();
             if (size != null) {
                 ffmpeg.addArgument("-s");
-                ffmpeg.addArgument(String.valueOf(size.getWidth()) + "x"
-                        + String.valueOf(size.getHeight()));
+                ffmpeg.addArgument(String.valueOf(size.getWidth()) + "x" + String.valueOf(size.getHeight()));
             }
 
             String startTime = videoAttributes.getStartTime();
@@ -803,32 +795,27 @@ public class Encoder {
                 ffmpeg.addArgument(duration);
             }
 
-            if (videoAttributes.getQv() != null &&
-                    videoAttributes.getQv().length() > 0) {
+            if (videoAttributes.getQv() != null && videoAttributes.getQv().length() > 0) {
                 ffmpeg.addArgument("-q:v");
                 ffmpeg.addArgument(videoAttributes.getQv());
             }
 
-            if (videoAttributes.getVf() != null &&
-                    videoAttributes.getVf().length() > 0) {
+            if (videoAttributes.getVf() != null && videoAttributes.getVf().length() > 0) {
                 ffmpeg.addArgument("-vf");
                 ffmpeg.addArgument(videoAttributes.getVf());
             }
 
-            if (videoAttributes.getBv() != null &&
-                    videoAttributes.getBv().length() > 0) {
+            if (videoAttributes.getBv() != null && videoAttributes.getBv().length() > 0) {
                 ffmpeg.addArgument("-b:v");
                 ffmpeg.addArgument(videoAttributes.getBv());
             }
 
-            if (videoAttributes.getBufsize() != null &&
-                    videoAttributes.getBufsize().length() > 0) {
+            if (videoAttributes.getBufsize() != null && videoAttributes.getBufsize().length() > 0) {
                 ffmpeg.addArgument("-bufsize");
                 ffmpeg.addArgument(videoAttributes.getBufsize());
             }
 
-            if (videoAttributes.getMaxrate() != null &&
-                    videoAttributes.getMaxrate().length() > 0) {
+            if (videoAttributes.getMaxrate() != null && videoAttributes.getMaxrate().length() > 0) {
                 ffmpeg.addArgument("-maxrate");
                 ffmpeg.addArgument(videoAttributes.getMaxrate());
             }
@@ -881,7 +868,7 @@ public class Encoder {
             if (videoAttributes == null || videoAttributes.getSetpts() == null || videoAttributes.getSetpts() == "") {
                 if (audioAttributes.getAf_Atempo() != null && audioAttributes.getAf_Atempo() != "") {
                     String af_atempo = audioAttributes.getAf_Atempo();
-                    String videoArg = String.format("atempo=%s",af_atempo);
+                    String videoArg = String.format("atempo=%s", af_atempo);
 
                     ffmpeg.addArgument("-af");
                     ffmpeg.addArgument(videoArg);
@@ -890,7 +877,7 @@ public class Encoder {
 
             if (audioAttributes.getAf_volume() != null && audioAttributes.getAf_volume() != "") {
                 String af_volume = audioAttributes.getAf_volume();
-                String audioArg = String.format("volume=%s",af_volume);
+                String audioArg = String.format("volume=%s", af_volume);
 
                 ffmpeg.addArgument("-af");
                 ffmpeg.addArgument(audioArg);
@@ -899,8 +886,7 @@ public class Encoder {
 
         if (videoAttributes != null && audioAttributes != null) {
             //音视频同时调整倍速
-            if (videoAttributes.getSetpts() != null && videoAttributes.getSetpts() != "" &&
-                    audioAttributes.getAf_Atempo() != null && audioAttributes.getAf_Atempo() != "") {
+            if (videoAttributes.getSetpts() != null && videoAttributes.getSetpts() != "" && audioAttributes.getAf_Atempo() != null && audioAttributes.getAf_Atempo() != "") {
                 //ffmpeg -i input.mkv -filter_complex "[0:v]setpts=0.5*PTS[v];[0:a]atempo=2.0[a]" -map "[v]" -map "[a]" output.mkv
                 String setptsValue = videoAttributes.getSetpts();
                 String videoArg = "[0:v]setpts=%s*PTS[v];";
@@ -971,16 +957,14 @@ public class Encoder {
             System.out.println(line);
             if (step == 0) {
                 if (line.startsWith("WARNING: ")) {
-                    if (listener != null)
-                        listener.message(line);
+                    if (listener != null) listener.message(line);
                 } else {
                     if (!line.startsWith("Output #0")) {
                         throw new EncoderException(line);
                     }
                     step++;
                 }
-            } else if ((step == 1) &&
-                    (!line.startsWith("  "))) {
+            } else if ((step == 1) && (!line.startsWith("  "))) {
                 step++;
             }
 
@@ -989,8 +973,7 @@ public class Encoder {
                     throw new EncoderException(line);
                 }
                 step++;
-            } else if ((step == 3) &&
-                    (!line.startsWith("  "))) {
+            } else if ((step == 3) && (!line.startsWith("  "))) {
                 step++;
             }
 
@@ -1032,8 +1015,7 @@ public class Encoder {
                 }
             }
         }
-        if ((lastWarning != null) &&
-                (!SUCCESS_PATTERN.matcher(lastWarning).matches()))
+        if ((lastWarning != null) && (!SUCCESS_PATTERN.matcher(lastWarning).matches()))
             throw new EncoderException(lastWarning);
     }
 
@@ -1048,15 +1030,11 @@ public class Encoder {
      * @throws InputFormatException     异常
      * @throws EncoderException         异常
      */
-    public void encodeMergeAudio(List<File> sourceList, File target, EncodingAttributes attributes)
-            throws IllegalArgumentException, InputFormatException,
-            EncoderException {
+    public void encodeMergeAudio(List<File> sourceList, File target, EncodingAttributes attributes) throws IllegalArgumentException, InputFormatException, EncoderException {
         encodeMergeAudio(sourceList, target, attributes, null);
     }
 
-    public void encodeMergeAudio(List<File> sourceList, File target, EncodingAttributes attributes,
-                                 EncoderProgressListener listener) throws IllegalArgumentException,
-            InputFormatException, EncoderException {
+    public void encodeMergeAudio(List<File> sourceList, File target, EncodingAttributes attributes, EncoderProgressListener listener) throws IllegalArgumentException, InputFormatException, EncoderException {
         String formatAttribute = attributes.getFormat();
         Float offsetAttribute = attributes.getOffset();
         Float durationAttribute = attributes.getDuration();
@@ -1067,8 +1045,7 @@ public class Encoder {
         VideoAttributes videoAttributes = attributes.getVideoAttributes();
 
         if (audioAttributes == null && videoAttributes == null) {
-            throw new IllegalArgumentException(
-                    "Both audio and video attributes are null");
+            throw new IllegalArgumentException("Both audio and video attributes are null");
         }
         target = target.getAbsoluteFile();
         target.getParentFile().mkdirs();
@@ -1154,23 +1131,18 @@ public class Encoder {
      * @throws InputFormatException     异常
      * @throws EncoderException         异常
      */
-    public void encodeMergeVideoAndAudio(List<File> files, File target, EncodingAttributes attributes)
-            throws IllegalArgumentException, InputFormatException,
-            EncoderException {
+    public void encodeMergeVideoAndAudio(List<File> files, File target, EncodingAttributes attributes) throws IllegalArgumentException, InputFormatException, EncoderException {
         encodeMergeVideoAndAudio(files, target, attributes, null);
     }
 
-    public void encodeMergeVideoAndAudio(List<File> files, File target, EncodingAttributes attributes,
-                                         EncoderProgressListener listener) throws IllegalArgumentException,
-            InputFormatException, EncoderException {
+    public void encodeMergeVideoAndAudio(List<File> files, File target, EncodingAttributes attributes, EncoderProgressListener listener) throws IllegalArgumentException, InputFormatException, EncoderException {
         String formatAttribute = attributes.getFormat();
         Float offsetAttribute = attributes.getOffset();
         Float durationAttribute = attributes.getDuration();
         AudioAttributes audioAttributes = attributes.getAudioAttributes();
         VideoAttributes videoAttributes = attributes.getVideoAttributes();
         if (audioAttributes == null && videoAttributes == null) {
-            throw new IllegalArgumentException(
-                    "Both audio and video attributes are null");
+            throw new IllegalArgumentException("Both audio and video attributes are null");
         }
         target = target.getAbsoluteFile();
         target.getParentFile().mkdirs();
@@ -1216,8 +1188,7 @@ public class Encoder {
             VideoSize size = videoAttributes.getSize();
             if (size != null) {
                 ffmpeg.addArgument("-s");
-                ffmpeg.addArgument(String.valueOf(size.getWidth()) + "x"
-                        + String.valueOf(size.getHeight()));
+                ffmpeg.addArgument(String.valueOf(size.getWidth()) + "x" + String.valueOf(size.getHeight()));
             }
 
             String startTime = videoAttributes.getStartTime();
@@ -1318,16 +1289,12 @@ public class Encoder {
      * @throws InputFormatException     异常
      * @throws EncoderException         异常
      */
-    public void encodeMergeVideoByDamaging(List<File> files, File target, EncodingAttributes attributes)
-            throws IllegalArgumentException, InputFormatException,
-            EncoderException {
+    public void encodeMergeVideoByDamaging(List<File> files, File target, EncodingAttributes attributes) throws IllegalArgumentException, InputFormatException, EncoderException {
         encodeMergeVideoByDamaging(files, target, attributes, null);
     }
 
 
-    public void encodeMergeVideoByDamaging(List<File> files, File target, EncodingAttributes attributes,
-                                           EncoderProgressListener listener) throws IllegalArgumentException,
-            InputFormatException, EncoderException {
+    public void encodeMergeVideoByDamaging(List<File> files, File target, EncodingAttributes attributes, EncoderProgressListener listener) throws IllegalArgumentException, InputFormatException, EncoderException {
         String formatAttribute = attributes.getFormat();
         Float offsetAttribute = attributes.getOffset();
         Float durationAttribute = attributes.getDuration();
@@ -1397,8 +1364,7 @@ public class Encoder {
             VideoSize size = videoAttributes.getSize();
             if (size != null) {
                 ffmpeg.addArgument("-s");
-                ffmpeg.addArgument(String.valueOf(size.getWidth()) + "x"
-                        + String.valueOf(size.getHeight()));
+                ffmpeg.addArgument(String.valueOf(size.getWidth()) + "x" + String.valueOf(size.getHeight()));
             }
 
             String startTime = videoAttributes.getStartTime();
@@ -1488,24 +1454,19 @@ public class Encoder {
      * @throws InputFormatException     异常
      * @throws EncoderException         异常
      */
-    public void encodeMergeVideoByLossless(File txtFile, File target, EncodingAttributes attributes)
-            throws IllegalArgumentException, InputFormatException,
-            EncoderException {
+    public void encodeMergeVideoByLossless(File txtFile, File target, EncodingAttributes attributes) throws IllegalArgumentException, InputFormatException, EncoderException {
         encodeMergeVideoByLossless(txtFile, target, attributes, null);
     }
 
 
-    public void encodeMergeVideoByLossless(File txtFile, File target, EncodingAttributes attributes,
-                                           EncoderProgressListener listener) throws IllegalArgumentException,
-            InputFormatException, EncoderException {
+    public void encodeMergeVideoByLossless(File txtFile, File target, EncodingAttributes attributes, EncoderProgressListener listener) throws IllegalArgumentException, InputFormatException, EncoderException {
         String formatAttribute = attributes.getFormat();
         Float offsetAttribute = attributes.getOffset();
         Float durationAttribute = attributes.getDuration();
         AudioAttributes audioAttributes = attributes.getAudioAttributes();
         VideoAttributes videoAttributes = attributes.getVideoAttributes();
         if (audioAttributes == null && videoAttributes == null) {
-            throw new IllegalArgumentException(
-                    "Both audio and video attributes are null");
+            throw new IllegalArgumentException("Both audio and video attributes are null");
         }
         target = target.getAbsoluteFile();
         target.getParentFile().mkdirs();
@@ -1554,8 +1515,7 @@ public class Encoder {
             VideoSize size = videoAttributes.getSize();
             if (size != null) {
                 ffmpeg.addArgument("-s");
-                ffmpeg.addArgument(String.valueOf(size.getWidth()) + "x"
-                        + String.valueOf(size.getHeight()));
+                ffmpeg.addArgument(String.valueOf(size.getWidth()) + "x" + String.valueOf(size.getHeight()));
             }
 
             String startTime = videoAttributes.getStartTime();

@@ -23,7 +23,7 @@ public class AudioTest {
 
     @Test
     public void getInfo() {
-        File mp3Target = new File("/Users/qaazz/Documents/testAudio14.wav");
+        File mp3Target = new File("target/test-classes/material/longAudio.mp3");
         Encoder encoder = new Encoder();
         try {
             MultimediaInfo info = encoder.getInfo(mp3Target);

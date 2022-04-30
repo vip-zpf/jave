@@ -20,6 +20,8 @@ package it.sauronsoftware.jave.video;
 
 import lombok.Data;
 
+import java.util.Date;
+
 @Data
 public class VideoInfo {
 
@@ -43,5 +45,10 @@ public class VideoInfo {
 	 * The video frame rate. If less than 0 this information is not available.
 	 */
 	private float frameRate = -1;
+
+	/**
+	 * mateData create Time
+	 */
+	private Date creationTime = null;
 
 }

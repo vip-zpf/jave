@@ -20,6 +20,8 @@ package it.sauronsoftware.jave.audio;
 
 import lombok.Data;
 
+import java.util.Date;
+
 @Data
 public class AudioInfo {
 
@@ -45,4 +47,9 @@ public class AudioInfo {
 	 * not available.
 	 */
 	private int bitRate = -1;
+
+	/**
+	 * mateData create Time
+	 */
+	private Date creationTime = null;
 }

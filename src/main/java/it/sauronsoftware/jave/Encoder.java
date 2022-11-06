@@ -20,6 +20,7 @@ package it.sauronsoftware.jave;
 
 import it.sauronsoftware.jave.audio.AudioAttributes;
 import it.sauronsoftware.jave.audio.AudioInfo;
+import it.sauronsoftware.jave.audio.VolumedetectInfo;
 import it.sauronsoftware.jave.enumers.AudioMergeTypeEnum;
 import it.sauronsoftware.jave.video.VideoAttributes;
 import it.sauronsoftware.jave.video.VideoInfo;
@@ -464,6 +465,39 @@ public class Encoder {
         }
     }
 
+    public MultimediaInfo getInfo(File source, File target, VideoAttributes videoAttributes, AudioAttributes audioAttributes, String format) throws InputFormatException, EncoderException {
+        FFMPEGExecutor ffmpeg = locator.createExecutor();
+        ffmpeg.addArgument("-i");
+        ffmpeg.addArgument(source.getAbsolutePath());
+
+        if (audioAttributes != null) {
+            if (audioAttributes.getFilterComplex() != null && audioAttributes.getFilterComplex() != "") {
+                ffmpeg.addArgument("-filter_complex");
+                ffmpeg.addArgument(audioAttributes.getFilterComplex());
+            }
+        }
+        if (format != null && format.length() > 0) {
+            ffmpeg.addArgument("-f");
+            ffmpeg.addArgument(format);
+        }
+        if (target != null) {
+            ffmpeg.addArgument("-y");
+            ffmpeg.addArgument(target.getAbsolutePath());
+        }
+        try {
+            ffmpeg.execute();
+        } catch (IOException e) {
+            throw new EncoderException(e);
+        }
+        try {
+            RBufferedReader reader = null;
+            reader = new RBufferedReader(new InputStreamReader(ffmpeg.getErrorStream()));
+            return parseMultimediaInfo(source, reader);
+        } finally {
+            ffmpeg.destroy();
+        }
+    }
+
     /**
      * Private utility. It parses the ffmpeg output, extracting informations
      * about a source multimedia file.
@@ -480,6 +514,7 @@ public class Encoder {
         Pattern p1 = Pattern.compile("^\\s*Input #0, (\\w+).+$\\s*", Pattern.CASE_INSENSITIVE);
         Pattern p2 = Pattern.compile("^\\s*Duration: (\\d\\d):(\\d\\d):(\\d\\d)\\.(\\d).*$", Pattern.CASE_INSENSITIVE);
         Pattern p3 = Pattern.compile("^\\s*Stream #\\S+: ((?:Audio)|(?:Video)|(?:Data)): (.*)\\s*$", Pattern.CASE_INSENSITIVE);
+        Pattern p4 = Pattern.compile("(\\[Parsed_volumedetect_0 @ )(\\w*)\\] ([a-z_A-Z]*)(\\d*)([a-zA-Z: ]*)([-.\\d]*)", Pattern.CASE_INSENSITIVE);
         MultimediaInfo info = null;
         boolean videoInfo = false;
         boolean audioInfo = false;
@@ -634,6 +669,41 @@ public class Encoder {
                         creationflag++;
                         creations.set(creations.size() - 1, creations.getLast() + split[1].trim());
                     }
+                }
+
+                Matcher m = p4.matcher(line);
+                if (m.find()) {
+                    if (audio == null) {
+                        audio = new AudioInfo();
+                    }
+                    if (audio.getVolumedetect() == null) {
+                        VolumedetectInfo volumedetectInfo = new VolumedetectInfo();
+                        audio.setVolumedetect(volumedetectInfo);
+                    }
+                    if (audio.getVolumedetect().getHistogramMap() == null) {
+                        HashMap<String, String> map = new HashMap<>();
+                        audio.getVolumedetect().setHistogramMap(map);
+                    }
+                    String type = m.group(3);
+                    if (type == null || type.length() == 0) {
+                        continue;
+                    }
+                    String group = m.group(4);
+                    String value = m.group(6);
+                    switch (type) {
+                        case "n_samples":
+                            break;
+                        case "mean_volume":
+                            audio.getVolumedetect().setMeanVolume(value);
+                            break;
+                        case "max_volume":
+                            audio.getVolumedetect().setMaxVolume(value);
+                            break;
+                        case "histogram_":
+                            audio.getVolumedetect().getHistogramMap().put(group + "db", value);
+                            break;
+                    }
+
                 }
                 if (step == 3) {
                     reader.reinsertLine(line);
@@ -863,6 +933,11 @@ public class Encoder {
             if (audioAttributes.getAf() != null && audioAttributes.getAf() != "") {
                 ffmpeg.addArgument("-af");
                 ffmpeg.addArgument(audioAttributes.getAf());
+            }
+
+            if (audioAttributes.getFilterComplex() != null && audioAttributes.getFilterComplex() != "") {
+                ffmpeg.addArgument("-filter_complex");
+                ffmpeg.addArgument(audioAttributes.getFilterComplex());
             }
 
             if (videoAttributes == null || videoAttributes.getSetpts() == null || videoAttributes.getSetpts() == "") {

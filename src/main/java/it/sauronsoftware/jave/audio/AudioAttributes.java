@@ -106,4 +106,6 @@ public class AudioAttributes {
      */
     private String ab;
 
+    private String filterComplex;
+
 }

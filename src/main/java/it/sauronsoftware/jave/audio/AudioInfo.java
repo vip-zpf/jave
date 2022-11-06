@@ -52,4 +52,9 @@ public class AudioInfo {
 	 * mateData create Time
 	 */
 	private Date creationTime = null;
+
+	/**
+	 * 音频分贝信息
+	 */
+	private VolumedetectInfo volumedetect;
 }

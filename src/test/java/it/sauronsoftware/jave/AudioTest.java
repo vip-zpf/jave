@@ -3,10 +3,12 @@ package it.sauronsoftware.jave;
 import it.sauronsoftware.jave.audio.AudioAttributes;
 import it.sauronsoftware.jave.audio.AudioInfo;
 import it.sauronsoftware.jave.audio.AudioUtils;
+import it.sauronsoftware.jave.audio.VolumedetectInfo;
 import org.junit.Test;
 
 import java.io.File;
 import java.util.Arrays;
+import java.util.Map;
 
 /**
  * jave 音频转换测试
@@ -115,6 +117,54 @@ public class AudioTest {
 
         AudioUtils.operate(source, target, encodingAttributes);
     }
+
+
+    @Test
+    public void getVolumedetect() {
+        //获取音频分贝
+        File source = new File("target/test-classes/material/diaochan.mp3");
+        File target = new File("/dev/null");
+
+        AudioAttributes audioAttributes = new AudioAttributes();
+        audioAttributes.setFilterComplex("volumedetect");
+
+        Encoder encoder = new Encoder();
+        MultimediaInfo multimediaInfo = null;
+        try {
+            multimediaInfo = encoder.getInfo(source, target, null, audioAttributes, "null");
+        } catch (EncoderException e) {
+            throw new RuntimeException(e);
+        }
+        AudioInfo audio = multimediaInfo.getAudio();
+        VolumedetectInfo volumedetect = audio.getVolumedetect();
+
+        //平均分贝
+        String meanVolume = volumedetect.getMeanVolume();
+        //最大分贝
+        String maxVolume = volumedetect.getMaxVolume();
+        //音频分贝分布情况
+        Map<String, String> histogramMap = volumedetect.getHistogramMap();
+    }
+
+    @Test
+    public void getAudioImg() {
+        //ffmpeg -i diaochan.mp3 -filter_complex "showwavespic=s=640x120" output.png
+        //获取音频 音波图
+        File source = new File("target/test-classes/material/diaochan.mp3");
+        File target = new File("target/test-classes/material/diaochan.png");
+
+        AudioAttributes audioAttributes = new AudioAttributes();
+        audioAttributes.setFilterComplex("showwavespic=s=640x120");
+
+        EncodingAttributes encodingAttributes = new EncodingAttributes();
+        encodingAttributes.setAudioAttributes(audioAttributes);
+
+        Encoder encoder = new Encoder();
+        AudioUtils.operate(source, target, encodingAttributes);
+    }
+
+
+
 
 
 }

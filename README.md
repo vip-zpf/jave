@@ -12,7 +12,7 @@
 <dependency>
     <groupId>com.github.vip-zpf</groupId>
     <artifactId>jave</artifactId>
-    <version>1.1.1</version>
+    <version>1.1.2</version>
 </dependency>
 ```
 
@@ -141,6 +141,52 @@ ffmpeg 是依赖运行环境的，JAVE 项目封装了ffmpeg，它通过上述�
     EncodingAttributes encodingAttributes = new EncodingAttributes();
     encodingAttributes.setAudioAttributes(audioAttributes);
 
+    AudioUtils.operate(source, target, encodingAttributes);
+```
+
+* 获取音频 分贝信息
+
+```
+    //注意：
+        //音频的分贝为负数是正常的，感兴趣的可以了解一下分贝的计算方法(log10，对电流等属性运算后的值取的数)
+        //其中越接近于0的，播放音量越大
+    File source = new File("target/test-classes/material/diaochan.mp3");
+    File target = new File("/dev/null");
+
+    AudioAttributes audioAttributes = new AudioAttributes();
+    audioAttributes.setFilterComplex("volumedetect");
+
+    Encoder encoder = new Encoder();
+    MultimediaInfo multimediaInfo = null;
+    try {
+        multimediaInfo = encoder.getInfo(source, target, null, audioAttributes, "null");
+    } catch (EncoderException e) {
+        throw new RuntimeException(e);
+    }
+    AudioInfo audio = multimediaInfo.getAudio();
+    VolumedetectInfo volumedetect = audio.getVolumedetect();
+    
+    //平均分贝
+    String meanVolume = volumedetect.getMeanVolume();
+    //最大分贝
+    String maxVolume = volumedetect.getMaxVolume();
+    //音频分贝分布情况
+    Map<String, String> histogramMap = volumedetect.getHistogramMap();
+```
+
+* 获取音频 波形图
+
+```
+    File source = new File("target/test-classes/material/diaochan.mp3");
+    File target = new File("target/test-classes/material/diaochan.png");
+
+    AudioAttributes audioAttributes = new AudioAttributes();
+    audioAttributes.setFilterComplex("showwavespic=s=640x120");
+
+    EncodingAttributes encodingAttributes = new EncodingAttributes();
+    encodingAttributes.setAudioAttributes(audioAttributes);
+
+    Encoder encoder = new Encoder();
     AudioUtils.operate(source, target, encodingAttributes);
 ```
 

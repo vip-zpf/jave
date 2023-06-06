@@ -12,7 +12,7 @@
 <dependency>
     <groupId>com.github.vip-zpf</groupId>
     <artifactId>jave</artifactId>
-    <version>1.1.2</version>
+    <version>1.1.4</version>
 </dependency>
 ```
 

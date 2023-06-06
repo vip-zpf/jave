@@ -6,7 +6,7 @@
 
     <groupId>com.github.vip-zpf</groupId>
     <artifactId>jave</artifactId>
-    <version>1.1.2</version>
+    <version>1.1.4</version>
 
     <parent>
         <groupId>org.sonatype.oss</groupId>
@@ -45,7 +45,7 @@
         <maven.compiler.target>1.8</maven.compiler.target>
         <slf4j.version>1.7.36</slf4j.version>
         <lombok.version>1.18.24</lombok.version>
-        <fastjson.version>2.0.1</fastjson.version>
+        <alibaba.fastjson2.version>2.0.33</alibaba.fastjson2.version>
         <ffmpeg.version>0.7.0</ffmpeg.version>
         <junit.version>4.13.2</junit.version>
 
@@ -80,10 +80,11 @@
             <version>${ffmpeg.version}</version>
         </dependency>
         <dependency>
-            <groupId>com.alibaba</groupId>
-            <artifactId>fastjson</artifactId>
-            <version>${fastjson.version}</version>
+            <groupId>com.alibaba.fastjson2</groupId>
+            <artifactId>fastjson2</artifactId>
+            <version>${alibaba.fastjson2.version}</version>
         </dependency>
+
 
 
     </dependencies>

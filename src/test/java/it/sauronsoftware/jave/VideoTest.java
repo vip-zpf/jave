@@ -41,7 +41,7 @@ public class VideoTest {
 
     @Test
     public void getVideo() throws EncoderException {
-        File source = new File("target/test-classes/material/girl.mp4");
+        File source = new File("target/test-classes/material/face.mp4");
         File target = new File("target/test-classes/material/target.wav");
         VideoUtils.getVoideoAudio(source, target, null);
     }

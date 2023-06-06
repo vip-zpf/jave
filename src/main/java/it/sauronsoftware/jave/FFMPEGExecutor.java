@@ -18,12 +18,12 @@
  */
 package it.sauronsoftware.jave;
 
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -70,6 +70,8 @@ class FFMPEGExecutor {
      */
     private InputStream errorStream = null;
 
+    private String errorMsg = null;
+
     /**
      * It build the executor.
      *
@@ -108,6 +110,11 @@ class FFMPEGExecutor {
         inputStream = ffmpeg.getInputStream();
         outputStream = ffmpeg.getOutputStream();
         errorStream = ffmpeg.getErrorStream();
+        if (errorStream != null) {
+            byte[] content = IOUtils.toByteArray(errorStream);
+            errorStream = new ByteArrayInputStream(content);
+            errorMsg = IOUtils.toString(new ByteArrayInputStream(content), "utf-8");
+        }
     }
 
     /**
@@ -141,6 +148,56 @@ class FFMPEGExecutor {
      * If there's a ffmpeg execution in progress, it kills it.
      */
     public void destroy() {
+        if (args != null || args.size() > 0) {
+            int size = args.size();
+            String param = (String) args.get(size - 2);
+            if (param != null && param != "" && param.equals("-y")) {
+                String targetValue = (String) args.get(size - 1);
+                if (targetValue != null && targetValue != "") {
+                    File result = null;
+                    String suffix = targetValue.substring(targetValue.lastIndexOf("."));
+                    File targetFile = new File(targetValue);
+                    if (targetFile.exists()) {
+                        targetValue = targetValue.replace(suffix, ".ok");
+                        result = new File(targetValue);
+                        try {
+                            File failFile = new File(targetValue.replace(suffix, ".fail"));
+                            if (failFile.exists()) {
+                                failFile.delete();
+                            }
+                            result.createNewFile();
+                        } catch (IOException e) {
+                            throw new RuntimeException(e);
+                        }
+                    }
+                    if (!targetFile.exists()) {
+                        targetValue = targetValue.replace(suffix, ".fail");
+                        result = new File(targetValue);
+                        if (errorMsg != null) {
+                            try {
+                                File okFile = new File(targetValue.replace(suffix, ".ok"));
+                                if (okFile.exists()) {
+                                    okFile.delete();
+                                }
+                                FileUtils.writeStringToFile(result, errorMsg, "utf-8");
+                            } catch (IOException e) {
+                                throw new RuntimeException(e);
+                            }
+                        }
+                        if (errorMsg == null) {
+                            try {
+                                result.createNewFile();
+                            } catch (IOException e) {
+                                throw new RuntimeException(e);
+                            }
+                        }
+                    }
+
+
+                }
+            }
+        }
+
         if (inputStream != null) {
             try {
                 inputStream.close();
@@ -174,6 +231,7 @@ class FFMPEGExecutor {
             runtime.removeShutdownHook(ffmpegKiller);
             ffmpegKiller = null;
         }
+
     }
 
 }
